@@ -78,6 +78,12 @@ export const mergePackage = function(targetPath) {
 	})
 };
 
+export const generateMeatFile = function(targetPath) {
+	return new Promise((resolve, reject) => {
+
+	})
+};
+
 export const installNodeModule = function(targetPath) {
 	return new Promise((resolve, rejcet) => {
 		let spinner = ora('Installing node modules ...').start();
