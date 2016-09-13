@@ -53,27 +53,6 @@ export const downloadGitRepo = function(from, to) {
 	})
 };
 
-export const generateMeatFile = function(targetPath) {
-	return new Promise((resolve, reject) => {
-		let resourcePkg = JSON.parse(fs.readFileSync(path.join(targetPath, 'package.json'), 'utf-8'));
-		let cmd2appJSON = resourcePkg.cmd2app || {};
-		let metaResult = '/*' +
-			' * Meta for cmd2app.' +
-			' */\n' +
-			`window.metaJSON = ${JSON.stringify(cmd2appJSON)};`;
-		fs.writeFile(path.join(__dirname, '../', 'template/render/meta.js'), metaResult, function(err) {
-			if (err) {
-				reject(err);
-				logger.fatal(err);
-			}
-			// replace `title` info
-			let indexHTMLPath = path.join(__dirname, '../', 'template/index.html');
-			fs.writeFileSync(indexHTMLPath, fs.readFileSync(indexHTMLPath, 'utf-8').replace(/\{\{title\}\}/, cmd2appJSON.title || 'cmd2app'));
-			resolve();
-		});
-	})
-};
-
 export const buildStatic = function() {
 	return new Promise((resolve, reject) => {
 		let spinner = ora('Building static ...').start();
@@ -99,6 +78,27 @@ export const copyElectronTemplate = function(targetPath) {
 				logger.fatal(err);
 			}
 			logger.success('Copy file succeed.');
+			resolve();
+		});
+	})
+};
+
+export const generateMeatFile = function(targetPath) {
+	return new Promise((resolve, reject) => {
+		let resourcePkg = JSON.parse(fs.readFileSync(path.join(targetPath, 'package.json'), 'utf-8'));
+		let cmd2appJSON = resourcePkg.cmd2app || {};
+		let metaResult = '/*' +
+			' * Meta for cmd2app.' +
+			' */\n' +
+			`window.metaJSON = ${JSON.stringify(cmd2appJSON)};`;
+		fs.writeFile(path.join(targetPath, '../', 'render/meta.js'), metaResult, function(err) {
+			if (err) {
+				reject(err);
+				logger.fatal(err);
+			}
+			// replace `title` info
+			let indexHTMLPath = path.join(targetPath, '../', 'index.html');
+			fs.writeFileSync(indexHTMLPath, fs.readFileSync(indexHTMLPath, 'utf-8').replace(/\{\{title\}\}/, cmd2appJSON.title || 'cmd2app'));
 			resolve();
 		});
 	})

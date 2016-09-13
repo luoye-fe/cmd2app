@@ -41,9 +41,9 @@ let generateReourcePath = path.join(process.cwd(), program.args[1], 'src', 'reso
 const run = async function() {
 	await checkDistBranch(repoName);
 	await downloadGitRepo(repoName, generateReourcePath);
-	await generateMeatFile(generateReourcePath);
 	await buildStatic();
 	await copyElectronTemplate(generateSrcPath);
+	await generateMeatFile(generateReourcePath);
 	await mergePackage(generateReourcePath);
 	await installNodeModule(generateSrcPath);
 	await buildAsar(generateSrcPath);
