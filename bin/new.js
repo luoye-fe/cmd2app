@@ -7,7 +7,7 @@ import inquirer from 'inquirer';
 
 import { isEmptySync } from './utils.js';
 import logger from './logger.js';
-import { checkDistBranch, downloadGitRepo, copyElectronTemplate, mergePackage, installNodeModule, buildAsar } from './process.js';
+import { checkDistBranch, downloadGitRepo, generateMeatFile, buildStatic, copyElectronTemplate, mergePackage, installNodeModule, buildAsar } from './process.js';
 
 program
 	.usage('<repo-name> [path]')
@@ -34,20 +34,23 @@ process.on('exit', function() {
 })
 
 let repoName = program.args[0];
-let generateMainPath = path.join(process.cwd(), program.args[1]);
+let generatePath = path.join(process.cwd(), program.args[1]);
 let generateSrcPath = path.join(process.cwd(), program.args[1], 'src');
-let generatePath = path.join(process.cwd(), program.args[1], 'src', 'resource');
+let generateReourcePath = path.join(process.cwd(), program.args[1], 'src', 'resource');
 
 const run = async function() {
 	await checkDistBranch(repoName);
-	await downloadGitRepo(repoName, generatePath);
+	await downloadGitRepo(repoName, generateReourcePath);
+	await generateMeatFile(generateReourcePath);
+	await buildStatic();
 	await copyElectronTemplate(generateSrcPath);
-	await mergePackage(generatePath);
+	await mergePackage(generateReourcePath);
 	await installNodeModule(generateSrcPath);
 	await buildAsar(generateSrcPath);
+	logger.success('All succeed.');
 }
 
-if (exits(generateMainPath) && !isEmptySync(generateMainPath)) {
+if (exits(generatePath) && !isEmptySync(generatePath)) {
 	inquirer.prompt([{
 		type: 'confirm',
 		message: 'Target directory exists and is not empty, continue?',
@@ -58,8 +61,8 @@ if (exits(generateMainPath) && !isEmptySync(generateMainPath)) {
 		}
 	})
 } else {
-	if (!exits(generateMainPath)) {
-		mkdirSync(generateMainPath);
+	if (!exits(generatePath)) {
+		mkdirSync(generatePath);
 	}
 	run();
 }

@@ -7,6 +7,8 @@ import ora from 'ora';
 import request from 'request';
 import { ncp } from 'ncp';
 import asar from 'asar';
+import { js as jsbeautify } from 'js-beautify';
+import Metalsmith from 'metalsmith';
 
 import merge from './merge-pkg.js';
 import logger from './logger.js';
@@ -45,19 +47,58 @@ export const downloadGitRepo = function(from, to) {
 				reject(err);
 				logger.fatal('Failed to download repo ' + template + ': ' + err.message.trim())
 			};
-			logger.success('Download succeed "%s".', from);
+			logger.success('Download repo succeed.');
 			resolve();
 		})
 	})
 };
 
-export const copyElectronTemplate = function(targetPath) {
+export const generateMeatFile = function(targetPath) {
 	return new Promise((resolve, reject) => {
-		ncp(path.join(__dirname, 'template/'), targetPath, function(err) {
+		let resourcePkg = JSON.parse(fs.readFileSync(path.join(targetPath, 'package.json'), 'utf-8'));
+		let cmd2appJSON = resourcePkg.cmd2app || {};
+		let metaResult = '/*' +
+			' * Meta for cmd2app.' +
+			' */\n' +
+			`window.metaJSON = ${JSON.stringify(cmd2appJSON)};`;
+		fs.writeFile(path.join(__dirname, '../', 'template/render/meta.js'), metaResult, function(err) {
 			if (err) {
 				reject(err);
 				logger.fatal(err);
 			}
+			// replace `title` info
+			let indexHTMLPath = path.join(__dirname, '../', 'template/index.html');
+			fs.writeFileSync(indexHTMLPath, fs.readFileSync(indexHTMLPath, 'utf-8').replace(/\{\{title\}\}/, cmd2appJSON.title || 'cmd2app'));
+			resolve();
+		});
+	})
+};
+
+export const buildStatic = function() {
+	return new Promise((resolve, reject) => {
+		let spinner = ora('Building static ...').start();
+		exec(`cd ${path.join(__dirname, '../')} && node webpack/webpack.babel.js`, (error, stdout, stderr) => {
+			spinner.stop();
+			if (error) {
+				reject(error);
+				logger.fatal(error);
+			}
+			logger.success('Build static succeed.');
+			resolve();
+		});
+	})
+};
+
+export const copyElectronTemplate = function(targetPath) {
+	return new Promise((resolve, reject) => {
+		let spinner = ora('Copying file ...').start();
+		ncp(path.join(__dirname, '../', 'template/'), targetPath, function(err) {
+			spinner.stop();
+			if (err) {
+				reject(err);
+				logger.fatal(err);
+			}
+			logger.success('Copy file succeed.');
 			resolve();
 		});
 	})
@@ -67,20 +108,19 @@ export const mergePackage = function(targetPath) {
 	return new Promise((resolve, reject) => {
 		let resourcePkg = fs.readFileSync(path.join(targetPath, 'package.json'));
 		let mainPkg = fs.readFileSync(path.join(targetPath, '../package.json'));
-		let resultPkg = merge(mainPkg, resourcePkg);
-		fs.writeFile(path.join(targetPath, '../package.json'), resultPkg, (err) => {
+		let resultPkg = JSON.parse(merge(mainPkg, resourcePkg));
+		resultPkg.binMain = resultPkg.main;
+		resultPkg.main = './main/app.babel/.js';
+		fs.writeFile(path.join(targetPath, '../package.json'), jsbeautify(JSON.stringify(resultPkg), {
+			'indent_with_tabs': true,
+			'indent_size': 4,
+		}), (err) => {
 			if (err) {
 				reject(err);
 				logger.fatal(err);
 			}
 			resolve();
 		});
-	})
-};
-
-export const generateMeatFile = function(targetPath) {
-	return new Promise((resolve, reject) => {
-
 	})
 };
 

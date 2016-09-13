@@ -15,4 +15,6 @@ node_modules/
 npm-debug.log
 
 # custom
-dist/
+template/render/*
+config/custom.config.js
+temp/

@@ -62,6 +62,7 @@ let webpackConfig =  {
 
 if (env === 'dev') {
 	webpackConfig.watch = true;
+	webpackConfig.devtool = '#eval-source-map';
 }
 
 if (env === 'production') {
