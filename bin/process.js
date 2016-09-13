@@ -110,7 +110,7 @@ export const mergePackage = function(targetPath) {
 		let mainPkg = fs.readFileSync(path.join(targetPath, '../package.json'));
 		let resultPkg = JSON.parse(merge(mainPkg, resourcePkg));
 		resultPkg.binMain = resultPkg.main;
-		resultPkg.main = './main/app.babel/.js';
+		resultPkg.main = './main/app.babel.js';
 		fs.writeFile(path.join(targetPath, '../package.json'), jsbeautify(JSON.stringify(resultPkg), {
 			'indent_with_tabs': true,
 			'indent_size': 4,
