@@ -7,7 +7,7 @@ import inquirer from 'inquirer';
 
 import { isEmptySync } from './utils.js';
 import logger from './logger.js';
-import { checkDistBranch, downloadGitRepo, generateMeatFile, buildStatic, copyElectronTemplate, mergePackage, installNodeModule, buildAsar } from './process.js';
+import { checkDistBranch, downloadGitRepo, checkLegal, generateMeatFile, buildStatic, copyElectronTemplate, mergePackage, installNodeModule, buildAsar } from './process.js';
 
 program
 	.usage('<repo-name> [path]')
@@ -41,6 +41,7 @@ let generateReourcePath = path.join(process.cwd(), program.args[1], 'src', 'reso
 const run = async function() {
 	await checkDistBranch(repoName);
 	await downloadGitRepo(repoName, generateReourcePath);
+	await checkLegal(generateReourcePath);
 	await buildStatic();
 	await copyElectronTemplate(generateSrcPath);
 	await generateMeatFile(generateReourcePath);

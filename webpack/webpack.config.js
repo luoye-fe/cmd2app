@@ -32,21 +32,23 @@ let webpackConfig =  {
 			loader: 'url',
 			query: {
 				limit: 10000,
-				name: 'static/img/[name].[hash:7].[ext]'
+				name: 'img/[name].[hash:7].[ext]'
 			}
 		}, {
 			test: /\.(woff2?|eot|ttf|otf|woff)(\?.*)?$/,
 			loader: 'url',
 			query: {
 				limit: 10000,
-				name: 'static/fonts/[name].[hash:7].[ext]'
+				name: 'fonts/[name].[hash:7].[ext]'
 			}
 		}]
 	},
 	resolve: {
 		extensions: ['', '.js', '.vue', '.scss'],
 		alias: {
-
+			utils: path.join(rootPath, './static/utils'),
+			store: path.join(rootPath, './static/vuex'),
+			actions: path.join(rootPath, './static/vuex/actions')
 		}
 	},
 	target: 'electron-renderer',

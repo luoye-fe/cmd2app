@@ -45,11 +45,25 @@ export const downloadGitRepo = function(from, to) {
 			spinner.stop();
 			if (err) {
 				reject(err);
-				logger.fatal('Failed to download repo ' + template + ': ' + err.message.trim())
+				logger.fatal('Failed to download repo ' + template + ': ' + err.message.trim());
 			};
 			logger.success('Download repo succeed.');
 			resolve();
 		})
+	})
+};
+
+export const checkLegal = function(targetPath) {
+	return new Promise((resolve, reject) => {
+		let spinner = ora('Checking repo legal ...').start();
+		let resourcePkg = JSON.parse(fs.readFileSync(path.join(targetPath, 'package.json'), 'utf-8'));
+		if (!resourcePkg.cmd2app) {
+			reject();
+			logger.fatal('This repo is illegal for cmd2app. More info: https://github.com/luoye-fe/cmd2app');
+		} else {
+			logger.success('Check repo legal succeed.');
+			resolve();
+		}
 	})
 };
 

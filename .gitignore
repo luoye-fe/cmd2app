@@ -18,3 +18,4 @@ npm-debug.log
 template/render/*
 config/custom.config.js
 temp/
+static.bak/

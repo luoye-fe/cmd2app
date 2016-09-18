@@ -1,13 +1,18 @@
 import Vue from 'vue';
 
+import store from 'store';
+
+import Index from './components/index.vue';
+
 const vm = new Vue({
 	el: '#app',
-	ready() {
-		console.log(123);
+	store: store,
+	components: {
+		'm-index': Index
 	},
 	template: `
 	<div>
-		<h1>test</h1>
+		<m-index></m-index>
 	</div>
 	`
 });
