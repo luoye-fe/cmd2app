@@ -8,7 +8,6 @@ import request from 'request';
 import { ncp } from 'ncp';
 import asar from 'asar';
 import { js as jsbeautify } from 'js-beautify';
-import Metalsmith from 'metalsmith';
 
 import merge from './merge-pkg.js';
 import logger from './logger.js';
