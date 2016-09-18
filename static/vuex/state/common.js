@@ -1,6 +1,6 @@
 export default {
 	alertConfig: {
-		show: true,
+		show: false,
 		dismissable: true,
 		type: 'info',  // success/infp/warning/danger
 		duration: 0,

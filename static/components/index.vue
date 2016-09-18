@@ -1,22 +1,21 @@
 <template>
 	<m-alert></m-alert>
 	<m-head></m-head>
-	<m-entry></m-entry>
-	<m-options></m-options>
-	<m-command></m-command>
+	<m-main></m-main>
 	<m-client></m-client>
 </template>
 <style lang="less">
-@import "~bootstrap/less/bootstrap.less";
-@import "../css/prism-coy.css";
+@import url('../css/app.less');
+.main-con {
+	padding: 20px;
+	box-sizing: border-box;
+}
 </style>
 <script>
 import Alert from './alert.vue';
 
 import Head from './head.vue';
-import Entry from './entry.vue';
-import Options from './options.vue';
-import Command from './command.vue';
+import Main from './main.vue';
 import Client from './client.vue';
 
 export default {
@@ -24,9 +23,7 @@ export default {
 	components: {
 		'm-alert': Alert,
 		'm-head': Head,
-		'm-entry': Entry,
-		'm-options': Options,
-		'm-command': Command,
+		'm-main': Main,
 		'm-client': Client
 	}
 };

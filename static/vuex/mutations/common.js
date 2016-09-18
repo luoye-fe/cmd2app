@@ -3,3 +3,9 @@ export const ALERT = (state, params) => {
 		state.alertConfig[item] = params[item];
 	}
 };
+
+export const HIDEALERT = (state) => {
+	state.alertConfig.show = false;
+};
+
+
