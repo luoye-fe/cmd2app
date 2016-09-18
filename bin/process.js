@@ -161,7 +161,7 @@ export const buildAsar = function(targetPath) {
 		}
 		asar.createPackage(targetPath, path.join(targetPath, '../dist/asar/app.asar'), function() {
 			spinner.stop();
-			logger.success('Build asar succeed.');
+			logger.success(`Build asar succeed. app.asar in ${path.join(targetPath, '../dist/asar/app.asar')}`);
 			resolve();
 		})
 	})
