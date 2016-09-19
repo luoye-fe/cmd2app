@@ -13,7 +13,6 @@ exports.fatal = function(message) {
 	if (message instanceof Error) message = message.message.trim()
 	var msg = format.apply(format, arguments)
 	console.error(chalk.red(prefix), sep, msg)
-	process.exit(1)
 }
 
 exports.success = function() {

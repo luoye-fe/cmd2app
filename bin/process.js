@@ -56,6 +56,7 @@ export const checkLegal = function(targetPath) {
 	return new Promise((resolve, reject) => {
 		let spinner = ora('Checking repo legal ...').start();
 		let resourcePkg = JSON.parse(fs.readFileSync(path.join(targetPath, 'package.json'), 'utf-8'));
+		spinner.stop();
 		if (!resourcePkg.cmd2app) {
 			reject();
 			logger.fatal('This repo is illegal for cmd2app. More info: https://github.com/luoye-fe/cmd2app');
