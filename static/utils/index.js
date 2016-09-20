@@ -11,4 +11,8 @@ let utils = {};
 
 utils.mixin = mixin;
 
+import * as common from './common.js';
+mixin(utils, common);
+
+
 export default utils;
