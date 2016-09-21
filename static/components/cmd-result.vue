@@ -1,8 +1,8 @@
-<template>
+<!-- <template>
 	<h1>Result</h1>
 	<pre>
 		<code>
-{{entry}} {{command}} {{option}}
+{{entry}} {{globaloption}} {{command}}
 		</code>
 	</pre>
 </template>
@@ -14,7 +14,7 @@ export default {
 		return {
 			entry: '',
 			cmmand: '',
-			option: '',
+			globaloption: '',
 		};
 	},
 	vuex: {
@@ -25,10 +25,14 @@ export default {
 	methods: {
 		generateRsult() {
 			this.entry = this.cmd.entry;
-			this.option = '';
-			this.cmd.optionsList.forEach((item) => {
-				this.option += `--${item.checkedOption}=${item.value} `;
+			this.globaloption = '';
+			this.cmd.globalOptions.forEach((item) => {
+				this.globaloption += `--${item.checkedOption}=${item.value} `;
 			});
+			// this.command += this.cmd.command.key + '';
+			// this.cmd.params.forEach((item) => {
+			// 	this.command += (item.value || '') + ' ';
+			// })
 		}
 	},
 	watch: {
@@ -41,3 +45,4 @@ export default {
 	}
 };
 </script>
+ -->

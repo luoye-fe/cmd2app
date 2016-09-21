@@ -1,7 +1,7 @@
 export default {
 	cmd: {
 		entry: '',
-		optionsList: [],
+		globalOptions: {},
 		command: {}
 	}
 };
