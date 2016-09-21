@@ -1,23 +1,29 @@
 <template>
-	<!-- <div class="form-item"> -->
-		
-	<!-- </div> -->
-	
 	<h1>Entry</h1>
-	<select>
-		<option v-for="(key, value) in metaJSON.bin" :value="value">{{key}}</option>
+	<select @change="updateEntry($event)">
+		<option v-for="(key, value) in metaJSON.bin" :value="key">{{key}}</option>
 	</select>
 </template>
 <style scoped>
 </style>
 <script>
 import store from 'store';
+import actions from 'actions';
 
 export default {
 	name: 'Entry',
 	vuex: {
 		getters: {
-			metaJSON: () => store.state.metaJSON
+			metaJSON: () => store.state.metaJSON,
+			entry: () => store.state.cmd.entry
+		}
+	},
+	ready() {
+		actions.updateEntry(store, Object.keys(this.metaJSON.bin)[0]);
+	},
+	methods: {
+		updateEntry(e) {
+			actions.updateEntry(store, e.target.value);
 		}
 	}
 };
