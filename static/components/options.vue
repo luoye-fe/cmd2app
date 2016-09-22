@@ -1,91 +1,19 @@
 <template>
 	<h1>Options</h1>
-	<button @click="addOption()">新增参数</button>
-	<div v-for="(index, optionItem) in currentOption">
-		<select v-model="optionItem.checked" @change="updateDesc($event)" :disabled="optionItem.disabled">
-			<option v-for="(key, item) in metaJSON.globalOptions" :value="key">{{key}}</option>
-		</select>
-		<input type="text" :placeholder="optionItem.desc" v-model="optionItem.value" :disabled="optionItem.disabled">
-		<i class="iconfont icon-aliicon" @click="delOption(index)"></i>
-		<button @click="modifyOption(index)">修改</button>
-		<button @click="applyOption(index)">确认</button>
-	</div>
+	<m-common-options :all-options="metaJSON.globalOptions" :is-command="false" :disabled="false"></m-common-options>
 </template>
-<style scoped>
-.icon-aliicon {
-	cursor: pointer;
-}
-</style>
 <script>
-import Vue from 'vue';
-
 import store from 'store';
-import actions from 'actions';
-
+import CommonOptopn from './common-options.vue';
 export default {
-	name: 'Options',
-	data() {
-		return {
-			currentOption: []
-		};
-	},
+	name: 'GlobalOptions',
 	vuex: {
 		getters: {
-			metaJSON: () => store.state.metaJSON,
-			globalOptions: () => store.state.cmd.globalOptions
+			metaJSON: () => store.state.metaJSON
 		}
 	},
-	methods: {
-		addOption() {
-			this.currentOption.push({
-				checked: Object.keys(this.metaJSON.globalOptions)[0],
-				value: '',
-				desc: this.metaJSON.globalOptions[Object.keys(this.metaJSON.globalOptions)[0]].desc,
-				disabled: false
-			})
-		},
-		updateDesc(e) {
-			this.currentOption.forEach((item) => {
-				if (item.checked === e.target.value) {
-					item.desc = this.metaJSON.globalOptions[e.target.value].desc;
-				}
-			})
-		},
-		delOption(index) {
-			actions.delOption(store, this.currentOption[index].checked);
-			this.currentOption.splice(index, 1);
-		},
-		modifyOption(index) {
-			this.currentOption[index].disabled = false;
-		},
-		applyOption(index) {
-			let tempcheck = {};
-			for (let i = 0; i < this.currentOption.length; i++) {
-				let item = this.currentOption[i];
-				if (item.disabled) {
-					tempcheck[item.checked] = true;
-				}
-			}
-			if (tempcheck[this.currentOption[index].checked]) {
-				actions.alert(store, {
-					show: true,
-					title: '提示',
-					msg: '参数已存在',
-					type: 'danger'
-				})
-				return;
-			}
-			this.currentOption[index].disabled = true;
-			let cur = {};
-			this.currentOption.forEach((item) => {
-				if (item.disabled) {
-					cur[item.checked] = {
-						value: item.value
-					}
-				}
-			})
-			actions.addNewOption(store, cur);
-		}
+	components: {
+		'm-common-options': CommonOptopn
 	}
 };
 </script>

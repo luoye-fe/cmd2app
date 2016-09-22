@@ -1,21 +1,18 @@
 <template>
 	<h1>Command</h1>
-	<button @click="addCommand(),showCommand = true">新增命令</button>
-	<div class="checked-command" v-show="showCommand">
-		<select @change="addCommand($event)">
-			<option v-for="(index, item) in metaJSON.command" :value="item.key">{{item.key}}</option>
+	<div class="checked-command">
+		<select @change="selectCommand($event)" :disabled="disabled">
+			<option value="null">无</option>
+			<option v-for="(key, item) in metaJSON.command" :value="key">{{key}}</option>
 		</select>
-		<input type="text" v-for="(index, item) in command.params" :placeholder="item.desc" :value="item.value" @input="updateCommandParam(index, $event)">
-		<button>新增命令参数</button>
-		<div v-for="(index, item) in command.options">
-			<!-- <select @change="updateCommandOption($event)">
-				<option value="null">无</option>
-				<option v-for="(index, item) in command.options" :value="item.key">{{item.key}}</option>
-			</select>
-			<input type="text" :placeholder="checkedCommandOptionDesc" v-show="showCommandOption" @input="updateCommandOptionVal($event)"> -->
+		<!-- <input type="text" v-for="(index, item) in command.params" :placeholder="item.desc" :value="item.value" @input="updateCommandParam(index, $event)"> -->
+		<div v-show="showAddOptionButton">
+			<m-common-options :all-options="currentCommand.options" :is-command="true" :disabled="disabled"></m-common-options>
 		</div>
-		<span @click="delCommand">删除</span>
-		<p>{{{command.desc}}}</p>
+		<div>
+			<button @click="modifyCommand()">修改</button>
+			<button @click="applyCommand()">确认</button>
+		</div>
 	</div>
 </template>
 <style scoped>
@@ -29,60 +26,47 @@ import actions from 'actions';
 
 import { copyObj } from 'utils/common.js';
 
+import CommonOptopn from './common-options.vue';
+
 export default {
 	name: 'Command',
 	data() {
 		return {
-			showCommand: false,
-			showCommandOption: false,
-			checkedCommandOptionIndex: 0,
-			checkedCommandOptionDesc: ''
+			showAddOptionButton: false,
+			currentCommand: {},
+			disabled: false
 		};
 	},
 	vuex: {
 		getters: {
-			metaJSON: () => store.state.metaJSON,
-			command: () => store.state.cmd.command
+			metaJSON: () => store.state.metaJSON
 		}
 	},
+	components: {
+		'm-common-options': CommonOptopn
+	},
 	methods: {
-		addCommand(e) {
-			if (!e) {
-				actions.addCommand(store, copyObj(this.metaJSON.command[0]));
-				return;
-			}
-			this.metaJSON.command.forEach((item) => {
-				if (item.key === e.target.value) {
-					actions.addCommand(store, copyObj(item));
-				}
-			})
-		},
-		delCommand() {
-			actions.delCommand(store);
-			this.showCommand = false;
-		},
-		updateCommandParam(index, e) {
-			actions.updateCommandParam(store, index, e.target.value);
-		},
-		updateCommandOption(e) {
-			actions.updateCommandOption(store, e.target.value);
-			if (e.target.value === 'null') {
-				this.showCommandOption = false;
+		selectCommand(e) {
+			let value = e.target.value;
+			if (value === 'null') {
+				this.currentCommand = {};
 			} else {
-				this.showCommandOption = true;
+				this.currentCommand = this.metaJSON.command[value];
 			}
-			this.getCheckedCommandOptionIndex(e.target.value);
 		},
-		getCheckedCommandOptionIndex(target) {
-			this.command.options.forEach((item, index) => {
-				if (item.key === target) {
-					this.checkedCommandOptionIndex = index;
-					this.checkedCommandOptionDesc = item.desc;
-				}
-			})
+		modifyCommand() {
+			this.disabled = false;
 		},
-		updateCommandOptionVal(e) {
-			actions.updateCommandOptionVal(store, e.target.value);
+		applyCommand() {
+			this.disabled = true;
+		}
+	},
+	watch: {
+		'currentCommand': {
+			handler() {
+				this.showAddOptionButton = !!Object.keys(this.currentCommand.options);
+			},
+			deep: true
 		}
 	}
 };

@@ -4,10 +4,6 @@ export const addNewOption = (store, params) => store.dispatch('ADDNEWOPTION', pa
 
 export const delOption = (store, index) => store.dispatch('DELOPTION', index);
 
-export const updateOptionVal = (store, index, e) => store.dispatch('UPDATEOPTIONVAL', index, e);
-
-export const updateOptionChecked = (store, index, e) => store.dispatch('UPDATEOPTIONCHECKED', index, e);
-
 export const addCommand = (store, params) => store.dispatch('ADDCOMMAND', params);
 
 export const delCommand = (store) => store.dispatch('DELCOMMAND');

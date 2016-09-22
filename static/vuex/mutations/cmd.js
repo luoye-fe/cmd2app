@@ -3,20 +3,20 @@ export const UPDATEENTRY = (state, value) => {
 	state.cmd.entry = value;
 };
 
-export const ADDNEWOPTION = (state, params) => {
-	state.cmd.globalOptions = params;
+export const ADDNEWOPTION = (state, params, command) => {
+	if (command) {
+
+	} else {
+		state.cmd.globalOptions = params;
+	}
 };
 
-export const DELOPTION = (state, key) => {
-	delete state.cmd.globalOptions[key];
-};
+export const DELOPTION = (state, key, command) => {
+	if (command) {
 
-export const UPDATEOPTIONVAL = (state, index, value) => {
-	state.cmd.globalOptions[index].value = value;
-};
-
-export const UPDATEOPTIONCHECKED = (state, index, value) => {
-	state.cmd.globalOptions[index].checkedOption = value;
+	} else {
+		delete state.cmd.globalOptions[key];
+	}
 };
 
 export const ADDCOMMAND = (state, params) => {
