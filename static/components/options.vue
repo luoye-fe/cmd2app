@@ -1,13 +1,14 @@
 <template>
 	<h1>Options</h1>
-	<button @click="addNewOptions()">新增参数</button>
-	<div v-for="(key, optionItem) in globalOptions">
-		<p>{{key}}</p>
-		<!-- <select @change="updateOptionChecked(key, $event)">
-			<option v-for="(index, item) in metaJSON.globalOptions" :value="item.key">{{item.key}}</option>
-		</select> -->
-		<!-- <input type="text" :placeholder="optionItem.desc" @input="updateOptionVal(key, $event)"> -->
-		<!-- <i class="iconfont icon-aliicon" @click="delOption(key)"></i> -->
+	<button @click="addOption()">新增参数</button>
+	<div v-for="(index, optionItem) in currentOption">
+		<select v-model="optionItem.checked" @change="updateDesc($event)" :disabled="optionItem.disabled">
+			<option v-for="(key, item) in metaJSON.globalOptions" :value="key">{{key}}</option>
+		</select>
+		<input type="text" :placeholder="optionItem.desc" v-model="optionItem.value" :disabled="optionItem.disabled">
+		<i class="iconfont icon-aliicon" @click="delOption(index)"></i>
+		<button @click="modifyOption(index)">修改</button>
+		<button @click="applyOption(index)">确认</button>
 	</div>
 </template>
 <style scoped>
@@ -16,11 +17,18 @@
 }
 </style>
 <script>
+import Vue from 'vue';
+
 import store from 'store';
 import actions from 'actions';
 
 export default {
 	name: 'Options',
+	data() {
+		return {
+			currentOption: []
+		};
+	},
 	vuex: {
 		getters: {
 			metaJSON: () => store.state.metaJSON,
@@ -28,20 +36,55 @@ export default {
 		}
 	},
 	methods: {
-		addNewOptions() {
-			actions.addNewOption(store, this.metaJSON.globalOptions[0].key, {
-				desc: this.metaJSON.globalOptions[0].desc,
-				value: ''
+		addOption() {
+			this.currentOption.push({
+				checked: Object.keys(this.metaJSON.globalOptions)[0],
+				value: '',
+				desc: this.metaJSON.globalOptions[Object.keys(this.metaJSON.globalOptions)[0]].desc,
+				disabled: false
+			})
+		},
+		updateDesc(e) {
+			this.currentOption.forEach((item) => {
+				if (item.checked === e.target.value) {
+					item.desc = this.metaJSON.globalOptions[e.target.value].desc;
+				}
 			})
 		},
 		delOption(index) {
-			actions.delOption(store, index);
+			actions.delOption(store, this.currentOption[index].checked);
+			this.currentOption.splice(index, 1);
 		},
-		updateOptionVal(index, e) {
-			actions.updateOptionVal(store, index, e.target.value);
+		modifyOption(index) {
+			this.currentOption[index].disabled = false;
 		},
-		updateOptionChecked(index, e) {
-			actions.updateOptionChecked(store, index, e.target.value);
+		applyOption(index) {
+			let tempcheck = {};
+			for (let i = 0; i < this.currentOption.length; i++) {
+				let item = this.currentOption[i];
+				if (item.disabled) {
+					tempcheck[item.checked] = true;
+				}
+			}
+			if (tempcheck[this.currentOption[index].checked]) {
+				actions.alert(store, {
+					show: true,
+					title: '提示',
+					msg: '参数已存在',
+					type: 'danger'
+				})
+				return;
+			}
+			this.currentOption[index].disabled = true;
+			let cur = {};
+			this.currentOption.forEach((item) => {
+				if (item.disabled) {
+					cur[item.checked] = {
+						value: item.value
+					}
+				}
+			})
+			actions.addNewOption(store, cur);
 		}
 	}
 };

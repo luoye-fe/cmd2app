@@ -1,6 +1,6 @@
 export const updateEntry = (store, value) => store.dispatch('UPDATEENTRY', value);
 
-export const addNewOption = (store, key, params) => store.dispatch('ADDNEWOPTION', key, params);
+export const addNewOption = (store, params) => store.dispatch('ADDNEWOPTION', params);
 
 export const delOption = (store, index) => store.dispatch('DELOPTION', index);
 

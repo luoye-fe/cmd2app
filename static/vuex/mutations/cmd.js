@@ -1,13 +1,14 @@
+import Vue from 'vue';
 export const UPDATEENTRY = (state, value) => {
 	state.cmd.entry = value;
 };
 
-export const ADDNEWOPTION = (state, key, parmas) => {
-	state.cmd.globalOptions[key] = parmas;
+export const ADDNEWOPTION = (state, params) => {
+	state.cmd.globalOptions = params;
 };
 
-export const DELOPTION = (state, index) => {
-	state.cmd.globalOptions.splice(index, 1);
+export const DELOPTION = (state, key) => {
+	delete state.cmd.globalOptions[key];
 };
 
 export const UPDATEOPTIONVAL = (state, index, value) => {
