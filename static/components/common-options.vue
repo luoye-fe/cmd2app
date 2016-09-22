@@ -1,10 +1,10 @@
 <template>
 	<button @click="addOption()" :disabled="disabled">新增参数</button>
 	<div v-for="(index, optionItem) in currentOption">
-		<select v-model="optionItem.checked" @change="updateDesc($event)" :disabled="optionItem.disabled">
+		<select v-model="optionItem.checked" @change="updateDesc($event)" :disabled="optionItem.disabled || disabled">
 			<option v-for="(key, item) in allOptions" :value="key">{{key}}</option>
 		</select>
-		<input type="text" :placeholder="optionItem.desc" v-model="optionItem.value" :disabled="optionItem.disabled">
+		<input type="text" :placeholder="optionItem.desc" v-model="optionItem.value" :disabled="optionItem.disabled || disabled">
 		<i class="iconfont icon-aliicon" @click="delOption(index)"></i>
 		<button @click="modifyOption(index)">修改</button>
 		<button @click="applyOption(index)">确认</button>
@@ -21,6 +21,8 @@ import Vue from 'vue';
 import store from 'store';
 import actions from 'actions';
 
+import Event from './event.vue';
+
 export default {
 	name: 'CommonOptions',
 	data() {
@@ -29,6 +31,13 @@ export default {
 		};
 	},
 	props: ['allOptions', 'isCommand', 'disabled'],
+	ready() {
+		Event.$on('applyAllOption', (isFromEvent) => {
+			this.currentOption.forEach((item, index) => {
+				this.applyOption(index, isFromEvent);
+			})
+		})
+	},
 	methods: {
 		addOption() {
 			this.currentOption.push({
@@ -52,7 +61,7 @@ export default {
 		modifyOption(index) {
 			this.currentOption[index].disabled = false;
 		},
-		applyOption(index) {
+		applyOption(index, isFromEvent) {
 			let tempcheck = {};
 			for (let i = 0; i < this.currentOption.length; i++) {
 				let item = this.currentOption[i];
@@ -60,7 +69,7 @@ export default {
 					tempcheck[item.checked] = true;
 				}
 			}
-			if (tempcheck[this.currentOption[index].checked]) {
+			if (tempcheck[this.currentOption[index].checked] && !isFromEvent) {
 				actions.alert(store, {
 					show: true,
 					title: '提示',
