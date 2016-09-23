@@ -13,9 +13,9 @@ export const ADDNEWOPTION = (state, params, command) => {
 
 export const DELOPTION = (state, key, command) => {
 	if (command) {
-		delete state.cmd.command.options[key];
+		Vue.delete(state.cmd.command.options, key);
 	} else {
-		delete state.cmd.globalOptions[key];
+		Vue.delete(state.cmd.globalOptions, key);
 	}
 };
 

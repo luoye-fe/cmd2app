@@ -54,6 +54,7 @@ export default {
 		selectCommand(e) {
 			let value = e.target.value;
 			if (value === 'null') {
+				this.currentEntry = '';
 				this.currentCommand = {};
 			} else {
 				this.currentEntry = value;
@@ -80,7 +81,7 @@ export default {
 	watch: {
 		'currentCommand': {
 			handler() {
-				this.showAddOptionButton = !!Object.keys(this.currentCommand.options);
+				this.showAddOptionButton = !!(this.currentCommand.options);
 			},
 			deep: true
 		}
