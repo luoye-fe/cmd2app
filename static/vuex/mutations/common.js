@@ -8,4 +8,6 @@ export const HIDEALERT = (state) => {
 	state.alertConfig.show = false;
 };
 
-
+export const TOGGLECLIENT = (state, show) => {
+	state.showClient = show;
+};

@@ -8,5 +8,6 @@ export default {
 		placement: 'top', // top/top-right
 		title: 'tips',
 		msg: 'This is tips main body.'
-	}
+	},
+	showClient: false
 };

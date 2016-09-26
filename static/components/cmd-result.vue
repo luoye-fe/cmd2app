@@ -1,13 +1,14 @@
 <template>
-	<h1>Result</h1>
-	<pre>
-		<code>
-{{entry}} {{globaloption}} {{command}}
-		</code>
-	</pre>
+	<div class="form-group form-group-sm">
+		<label>Result</label>
+		<pre><code>{{entry}}{{globaloption}}{{command}}</code></pre>
+		<button type="button" class="btn btn-success btn-sm" @click="runCommand()">运行</button>
+	</div>
 </template>
 <script>
 import store from 'store';
+import actions from 'actions';
+
 export default {
 	name: 'CmdResult',
 	data() {
@@ -26,26 +27,29 @@ export default {
 		generateRsult() {
 			this.entry = ''
 			this.globaloption = '';
-			this.command = '';
+			this.command = ' ';
 			this.entry = this.cmd.entry;
 			Object.keys(this.cmd.globalOptions).forEach((item) => {
 				let curOption = this.cmd.globalOptions[item];
-				this.globaloption += `--${item}=${curOption.value}`;
+				this.globaloption += ` --${item}=${curOption.value}`;
 			});
 			if (this.cmd.command.key) {
-				this.command += this.cmd.command.key + ' ';
+				this.command += this.cmd.command.key;
 				if (this.cmd.command.params) {
 					this.cmd.command.params.forEach((item) => {
-						this.command += (item.value || '') + ' ';
+						this.command += item.value ? (' ' + item.value) : '';
 					})
 				}
 				if (this.cmd.command.options) {
 					Object.keys(this.cmd.command.options).forEach((item) => {
 						let curOption = this.cmd.command.options[item];
-						this.command += `--${item}=${curOption.value}`;
+						this.command += ` --${item}=${curOption.value}`;
 					});
 				}
 			}
+		},
+		runCommand() {
+			actions.addHistory(store, this.entry + this.globaloption + this.command);
 		}
 	},
 	watch: {

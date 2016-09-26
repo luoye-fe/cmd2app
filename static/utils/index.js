@@ -12,7 +12,9 @@ let utils = {};
 utils.mixin = mixin;
 
 import * as common from './common.js';
+import * as storge from './storge.js';
 mixin(utils, common);
+mixin(utils, storge);
 
 
 export default utils;

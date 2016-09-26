@@ -1,8 +1,10 @@
 <template>
-	<h1>Entry</h1>
-	<select @change="updateEntry($event)">
-		<option v-for="(key, value) in metaJSON.bin" :value="key">{{key}}</option>
-	</select>
+	<div class="form-group form-group-sm">
+		<label>Entry</label>
+		<select @change="updateEntry($event)" class="form-control">
+			<option v-for="(key, value) in metaJSON.bin" :value="key">{{key}}</option>
+		</select>
+	</div>
 </template>
 <style scoped>
 </style>

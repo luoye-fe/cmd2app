@@ -3,7 +3,10 @@
 </template>
 <style scoped>
 h1 {
-	
+	font-size: 28px;
+	padding: 10px 15px 0;
+	line-height: 28px;
+	margin: 0;
 }	
 </style>
 <script>

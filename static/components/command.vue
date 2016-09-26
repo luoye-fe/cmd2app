@@ -1,17 +1,25 @@
 <template>
-	<h1>Command</h1>
-	<div class="checked-command">
-		<select @change="selectCommand($event)" :disabled="disabled">
-			<option value="null">无</option>
-			<option v-for="(key, item) in metaJSON.command" :value="key">{{key}}</option>
-		</select>
-		<input type="text" :disabled="disabled" v-for="(index, item) in currentCommand.params" :placeholder="item.desc" :value="item.value" @input="updateCommandParams($event, index)">
-		<div v-show="showAddOptionButton">
-			<m-common-options :all-options="currentCommand.options" :is-command="true" :disabled="disabled"></m-common-options>
-		</div>
-		<div>
-			<button @click="modifyCommand()">修改</button>
-			<button @click="applyCommand()">确认</button>
+	<div class="form-group form-group-sm">
+		<label>Command</label>
+		<div class="checked-command">
+			<div class="row">
+				<div class="col-xs-3">
+					<select class="form-control" @change="selectCommand($event)" :disabled="disabled">
+						<option value="null">无</option>
+						<option v-for="(key, item) in metaJSON.command" :value="key">{{key}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="flex-input">
+				<input class="form-control" type="text" :disabled="disabled" v-for="(index, item) in currentCommand.params" :placeholder="item.desc" :value="item.value" @input="updateCommandParams($event, index)">
+			</div>
+			<div v-show="showAddOptionButton" class="form-group form-group-sm">
+				<m-common-options :all-options="currentCommand.options" :is-command="true" :disabled="disabled"></m-common-options>
+			</div>
+			<div class="button-group">
+				<button type="button" class="btn btn-primary btn-sm" @click="modifyCommand()">修改</button>
+				<button type="button" class="btn btn-success btn-sm" @click="applyCommand()">确认</button>
+			</div>
 		</div>
 	</div>
 </template>
@@ -19,6 +27,20 @@
 .checked-command span {
 	cursor: pointer;
 }
+.flex-input{
+	padding: 10px 0;
+	box-sizing: border-box;
+}
+.flex-input input {
+	display: inline-block;vertical-align: middle;max-width: 200px;margin: 0 5px;
+}
+.flex-input input:nth-child(1){
+	margin-left: 0;
+}
+.flex-input input:last-child{
+	margin-right: 0;
+}
+
 </style>
 <script>
 import Vue from 'vue';

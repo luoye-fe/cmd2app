@@ -54,11 +54,11 @@ export default {
 	name: 'Welcome',
 	data() {
 		return {
-			isFirst: window.localStorage.getItem('fet-welcome')
+			isFirst: window.localStorage.getItem('cmd2app-welcome')
 		};
 	},
 	ready() {
-		window.localStorage.setItem('fet-welcome', false);
+		window.localStorage.setItem('cmd2app-welcome', false);
 	},
 	methods: {
 		openUrl: openUrl,

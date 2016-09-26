@@ -1,18 +1,29 @@
 <template>
-	<button @click="addOption()" :disabled="disabled">新增参数</button>
-	<div v-for="(index, optionItem) in currentOption">
-		<select v-model="optionItem.checked" @change="updateDesc($event)" :disabled="optionItem.disabled || disabled">
-			<option v-for="(key, item) in allOptions" :value="key">{{key}}</option>
-		</select>
-		<input type="text" :placeholder="optionItem.desc" v-model="optionItem.value" :disabled="optionItem.disabled || disabled">
-		<i class="iconfont icon-aliicon" @click="delOption(index)"></i>
-		<button @click="modifyOption(index)">修改</button>
-		<button @click="applyOption(index)">确认</button>
+	<div>
+		<button type="button" @click="addOption()" :disabled="disabled" class="btn btn-default btn-sm">新增参数</button>
+		<div v-for="(index, optionItem) in currentOption" class="row">
+			<div class="col-xs-3">
+				<select class="form-control" v-model="optionItem.checked" @change="updateDesc($event)" :disabled="optionItem.disabled || disabled">
+					<option v-for="(key, item) in allOptions" :value="key">{{key}}</option>
+				</select>
+			</div>
+			<div class="col-xs-6">
+				<input class="form-control" style="width: 100%;" type="text" :placeholder="optionItem.desc" v-model="optionItem.value" :disabled="optionItem.disabled || disabled">
+			</div>
+			<div class="col-xs-3">
+				<button type="button" class="btn btn-danger btn-sm" @click="delOption(index)">删除</button>
+				<button type="button" class="btn btn-primary btn-sm" @click="modifyOption(index)">修改</button>
+				<button type="button" class="btn btn-success btn-sm" @click="applyOption(index)">确认</button>
+			</div>
+		</div>
 	</div>
 </template>
 <style scoped>
 .icon-aliicon {
 	cursor: pointer;
+}
+.row {
+	padding: 10px 0 5px;box-sizing: border-box;
 }
 </style>
 <script>

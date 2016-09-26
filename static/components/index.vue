@@ -1,11 +1,12 @@
 <template>
-	<m-alert></m-alert>
 	<m-head></m-head>
 	<m-main></m-main>
+	<m-alert></m-alert>
 	<m-client></m-client>
 	<m-welcome></m-welcome>
 </template>
 <style lang="less">
+@import url('~bootstrap/less/bootstrap.less');
 @import url('../css/app.less');
 </style>
 <script>
