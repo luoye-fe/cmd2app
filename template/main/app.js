@@ -1,6 +1,8 @@
 import path from 'path';
 import { app, BrowserWindow, Tray, Menu } from 'electron';
 
+import './ipc/index.js';
+
 import env from './env.js';
 
 let mainWindow = null;
