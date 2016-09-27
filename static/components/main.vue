@@ -11,6 +11,7 @@
 .main-form{
 	padding: 10px 15px;
 	box-sizing: border-box;
+	padding-bottom: 150px;
 }
 </style>
 <script>

@@ -51,6 +51,15 @@ export default {
 	},
 	methods: {
 		addOption() {
+			if (this.currentOption.length >= Object.keys(this.allOptions).length) {
+				actions.alert(store, {
+					show: true,
+					title: '提示',
+					msg: '已达最大 Option 数',
+					type: 'warning'
+				})
+				return;
+			}
 			this.currentOption.push({
 				checked: Object.keys(this.allOptions)[0],
 				value: '',

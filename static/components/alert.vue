@@ -58,11 +58,15 @@
 
 .alert_main h2 {
 	font-size: 16px;
+	padding: 0;
+	margin: 0;
 }
 
 .alert_main p {
 	font-size: 14px;
 	line-height: 24px;
+	padding: 0;
+	margin: 0;
 }
 </style>
 <script>
