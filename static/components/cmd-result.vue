@@ -2,12 +2,19 @@
 	<div class="form-group form-group-sm">
 		<label>Result</label>
 		<pre><code>{{entry}}{{globaloption}}{{command}}</code></pre>
+		<hr>
 		<button type="button" class="btn btn-success btn-sm" @click="runCommand()">运行</button>
+		<div style="margin-top: 15px;">
+			<a class="btn btn-info btn-sm" href="javascript:void(0)" @click="openUrl(metaJSON.repository)">This repo README.md</a>
+		</div>
+		<hr>
 	</div>
 </template>
 <script>
 import store from 'store';
 import actions from 'actions';
+
+import { openUrl } from 'utils/common.js';
 
 export default {
 	name: 'CmdResult',
@@ -20,7 +27,8 @@ export default {
 	},
 	vuex: {
 		getters: {
-			cmd: () => store.state.cmd
+			cmd: () => store.state.cmd,
+			metaJSON: () => store.state.metaJSON
 		}
 	},
 	methods: {
@@ -50,7 +58,8 @@ export default {
 		},
 		runCommand() {
 			actions.addHistory(store, this.entry + this.globaloption + this.command);
-		}
+		},
+		openUrl: openUrl
 	},
 	watch: {
 		'cmd': {

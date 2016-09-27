@@ -2,6 +2,7 @@
 	<div class="form-group form-group-sm">
 		<label>Global Options</label>
 		<m-common-options :all-options="metaJSON.globalOptions" :is-command="false" :disabled="false"></m-common-options>
+		<hr>
 	</div>
 </template>
 <script>

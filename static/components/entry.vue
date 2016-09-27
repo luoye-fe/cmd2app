@@ -4,6 +4,7 @@
 		<select @change="updateEntry($event)" class="form-control">
 			<option v-for="(key, value) in metaJSON.bin" :value="key">{{key}}</option>
 		</select>
+		<hr>
 	</div>
 </template>
 <style scoped>

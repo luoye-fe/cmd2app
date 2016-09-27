@@ -18,7 +18,7 @@ cmd2app new gomeplusFED/meixin-h5-proxy ./temp
 <style scoped>
 .welcome {
 	position: fixed;
-	z-index: 99999;
+	z-index: 9998;
 	width: 100%;
 	height: 100%;
 	top: 0;

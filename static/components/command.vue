@@ -21,6 +21,8 @@
 				<button type="button" class="btn btn-success btn-sm" @click="applyCommand()">确认</button>
 			</div>
 		</div>
+		<pre style="margin-top: 15px;" v-show="currentCommand.desc"><code>{{currentCommand.desc}}</code></pre>
+		<hr>
 	</div>
 </template>
 <style scoped>
@@ -40,7 +42,6 @@
 .flex-input input:last-child{
 	margin-right: 0;
 }
-
 </style>
 <script>
 import Vue from 'vue';
