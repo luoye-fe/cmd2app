@@ -1,5 +1,5 @@
 <template>
-	<div class="form-group form-group-sm">
+	<div class="form-group form-group-sm" v-show="metaJSON.command">
 		<label>Command</label>
 		<div class="checked-command">
 			<div class="row">
