@@ -145,10 +145,21 @@ export default {
 	},
 	ready() {
 		ipcRenderer.on('app-init-has-check', (ev, result) => {
-			console.log(result);
+			// console.log(result);
+			if (result.error) {
+				this.dealInitError(result.type);
+			} else {
+
+			}
 		})
 		ipcRenderer.send('app-init-will-check', copyObj(window.metaJSON));
-		console.log(process.cwd());
+	},
+	methods: {
+		dealInitError(type) {
+			// if (type === '') {
+
+			// }
+		}
 	}
 };
 </script>

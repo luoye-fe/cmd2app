@@ -2,7 +2,7 @@
 	<div class="form-group form-group-sm">
 		<label>Entry</label>
 		<select @change="updateEntry($event)" class="form-control">
-			<option v-for="(key, value) in metaJSON.bin" :value="key">{{key}}</option>
+			<option v-for="key in metaJSON.bin" :value="key">{{key}}</option>
 		</select>
 		<hr>
 	</div>
@@ -22,7 +22,7 @@ export default {
 		}
 	},
 	ready() {
-		actions.updateEntry(store, Object.keys(this.metaJSON.bin)[0]);
+		actions.updateEntry(store, this.metaJSON.bin[0]);
 	},
 	methods: {
 		updateEntry(e) {
