@@ -11,29 +11,10 @@
 				<p>{{tips}}</p>
 			</div>
 		</div>
-		<div class="modal" transition="fade">
-			<div class="modal-dialog modal-sm">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-						<h4 class="modal-title">Modal title</h4>
-					</div>
-					<div class="modal-body">
-						<p>One fine body&hellip;</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary">Save changes</button>
-					</div>
-				</div>
-			</div>
-		</div>
+		<m-require-sudo-pwd :show-modal.sync="showModal" :meta-json="metaJSON"></m-require-sudo-pwd>
 	</div>
 </template>
 <style scoped>
-.modal {
-	display: block!important;
-}
 .init {
 	position: fixed;
 	z-index: 9999;
@@ -154,30 +135,32 @@ import { ipcRenderer } from 'electron';
 
 import { copyObj } from '../utils/common.js';
 
+import RequireSudoPwd from './require-sudo-pwd.vue';
+
 export default {
 	name: 'Init',
 	data() {
 		return {
 			showInit: true,
-			tips: '正在初始化 ...'
+			tips: '正在初始化 ...',
+			showModal: false,
+			metaJSON: window.metaJSON
 		};
+	},
+	components: {
+		'm-require-sudo-pwd': RequireSudoPwd
 	},
 	ready() {
 		ipcRenderer.on('app-init-has-check', (ev, result) => {
-			// console.log(result);
+			console.log(result);
 			if (result.error) {
-				this.dealInitError(result.type);
+				this.showModal = true;
 			} else {
 				this.tips = '初始化完成';
 				this.showInit = false;
 			}
 		})
 		ipcRenderer.send('app-init-will-check', copyObj(window.metaJSON));
-	},
-	methods: {
-		dealInitError(type) {
-
-		}
 	}
 };
 </script>

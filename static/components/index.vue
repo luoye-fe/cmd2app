@@ -7,7 +7,6 @@
 	<m-welcome></m-welcome>
 </template>
 <style lang="less">
-@import url('~bootstrap/less/bootstrap.less');
 @import url('../css/app.less');
 </style>
 <script>

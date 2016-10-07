@@ -10,11 +10,11 @@ const resourcePath = path.join(__dirname, '../../resource');
 let sudo_pwd = '';
 
 function apply(success, fail) {
-	let cmd = '';
+    let cmd = '';
     if (platform !== 'win32') {
-    	cmd = `cd ${resourcePath} && echo ${sudo_pwd} | sudo npm link`;
+        cmd = `cd ${resourcePath} && echo ${sudo_pwd} | sudo -S npm link`;
     } else {
-    	cmd = `cd ${resourcePath} && npm link`;
+        cmd = `cd ${resourcePath} && npm link`;
     }
     exec(cmd, (err, stdout, stderr) => {
         if (err) {
@@ -25,41 +25,42 @@ function apply(success, fail) {
     });
 }
 
-function ipcToRenderForSudoPwd() {
-
-}
-
 function tryToApply() {
     apply(() => {
         // success
-        ev.sender.send('app-init-has-check', {
-            error: 0
-        });
+        
     }, () => {
         // fail
-        if (platform !== 'win32') {
-            ev.sender.send('app-init-has-check', {
-                error: 1
-            });
-        } else {
-            ev.sender.send('app-init-has-check', {
-                error: 1
-            });
-        }
+        
     })
 }
 
 ipcMain.on('app-init-will-check', (ev, metaJSON) => {
     let result = {};
-
+    let cur = false;
     for (let i = 0; i < metaJSON.bin.length; i++) {
-    	(function(j) {
+        (function(j) {
             commandExists(metaJSON.bin[j], (err, exist) => {
-                if (err) {
-                    tryToApply();
+                if (!exist) {
+                    // tryToApply();
+                    cur = true;
+                    console.log(cur);
+                    ev.sender.send('app-init-has-check', {
+                        error: 1
+                    });
                     return;
                 }
             })
         })(i)
     }
+    console.log(cur);
+    if (!cur) {
+        ev.sender.send('app-init-has-check', {
+            error: 0
+        });
+    }
 });
+
+ipcMain.on('app-init-input-pwd', (ev, pwd) => {
+    sudo_pwd = pwd;
+})
