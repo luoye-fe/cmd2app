@@ -44,7 +44,7 @@ const run = async function() {
 	await checkLegal(generateReourcePath);
 	await buildStatic();
 	await copyElectronTemplate(generateSrcPath);
-	await generateMeatFile(generateReourcePath);
+	await generateMeatFile(generateReourcePath, repoName);
 	await mergePackage(generateReourcePath);
 	await installNodeModule(generateSrcPath);
 	await buildAsar(generateSrcPath);

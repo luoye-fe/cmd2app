@@ -5,7 +5,7 @@
 		<hr>
 		<button type="button" class="btn btn-success btn-sm" @click="runCommand()">运行</button>
 		<div style="margin-top: 15px;">
-			<a class="btn btn-info btn-sm" href="javascript:void(0)" @click="openUrl(metaJSON.repository)">This repo README.md</a>
+			<a class="btn btn-info btn-sm" href="javascript:void(0)" @click="openUrl(metaJSON.repository)">README.md</a>
 		</div>
 		<hr>
 	</div>

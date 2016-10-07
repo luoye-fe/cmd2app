@@ -1,5 +1,5 @@
 <template>
-	<div class="init">
+	<div class="init" v-show="showInit">
 		<div class="loading_con" transition="fade">
 			<div class="loading">
 				<span></span>
@@ -8,14 +8,33 @@
 				<span></span>
 				<span></span>
 				<span></span>
-				<p>正在初始化 ...</p>
+				<p>{{tips}}</p>
+			</div>
+		</div>
+		<div class="modal" transition="fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+						<h4 class="modal-title">Modal title</h4>
+					</div>
+					<div class="modal-body">
+						<p>One fine body&hellip;</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary">Save changes</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <style scoped>
+.modal {
+	display: block!important;
+}
 .init {
-	display: none;
 	position: fixed;
 	z-index: 9999;
 	top: 0;
@@ -32,7 +51,6 @@
 	top: 0;
 	left: 0;
 	background-color: rgba(0, 0, 0, 0);
-	z-index: 9999;
 }
 
 .loading_con .loading {
@@ -140,7 +158,8 @@ export default {
 	name: 'Init',
 	data() {
 		return {
-			// showInit: 
+			showInit: true,
+			tips: '正在初始化 ...'
 		};
 	},
 	ready() {
@@ -149,16 +168,15 @@ export default {
 			if (result.error) {
 				this.dealInitError(result.type);
 			} else {
-
+				this.tips = '初始化完成';
+				this.showInit = false;
 			}
 		})
 		ipcRenderer.send('app-init-will-check', copyObj(window.metaJSON));
 	},
 	methods: {
 		dealInitError(type) {
-			// if (type === '') {
 
-			// }
 		}
 	}
 };

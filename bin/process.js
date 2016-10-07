@@ -97,10 +97,11 @@ export const copyElectronTemplate = function(targetPath) {
 	})
 };
 
-export const generateMeatFile = function(targetPath) {
+export const generateMeatFile = function(targetPath, repoName) {
 	return new Promise((resolve, reject) => {
 		let resourcePkg = JSON.parse(fs.readFileSync(path.join(targetPath, 'package.json'), 'utf-8'));
 		let cmd2appJSON = resourcePkg.cmd2app || {};
+		cmd2appJSON.repository = `https://github.com/${repoName}`;
 		let metaResult = '/*' +
 			' * Meta for cmd2app.' +
 			' */\n' +
@@ -123,7 +124,6 @@ export const mergePackage = function(targetPath) {
 		let resourcePkg = fs.readFileSync(path.join(targetPath, 'package.json'));
 		let mainPkg = fs.readFileSync(path.join(targetPath, '../package.json'));
 		let resultPkg = JSON.parse(merge(mainPkg, resourcePkg));
-		resultPkg.binMain = resultPkg.main;
 		resultPkg.main = './main/app.babel.js';
 		fs.writeFile(path.join(targetPath, '../package.json'), jsbeautify(JSON.stringify(resultPkg), {
 			'indent_with_tabs': true,

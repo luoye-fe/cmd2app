@@ -1,6 +1,5 @@
+import 'shelljs/global';
 import fs from 'fs';
-
-import { exec } from 'child_process';
 
 import chalk from 'chalk';
 
