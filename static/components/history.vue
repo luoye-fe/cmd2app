@@ -18,7 +18,7 @@
 					<td class="opt-button">
 						<div>
 							<button type="button" class="btn btn-danger btn-sm" @click="delCommand(index)">删除</button>
-							<button type="button" class="btn btn-success btn-sm" @click="runCommand(index)">运行</button>
+							<button type="button" class="btn btn-success btn-sm" @click="runCommand(item)">运行</button>
 						</div>
 					</td>
 				</tr>
@@ -71,6 +71,8 @@
 import store from 'store';
 import actions from 'actions';
 
+import { ipcRenderer } from 'electron';
+
 export default {
 	name: 'History',
 	vuex: {
@@ -82,8 +84,8 @@ export default {
 		delCommand(index) {
 			actions.delHistory(store, index);
 		},
-		runCommand() {
-
+		runCommand(item) {
+			ipcRenderer.send('command-will-run', item);
 		}
 	}
 };

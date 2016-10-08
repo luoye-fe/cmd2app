@@ -14,6 +14,8 @@
 import store from 'store';
 import actions from 'actions';
 
+import { ipcRenderer } from 'electron';
+
 import { openUrl } from 'utils/common.js';
 
 export default {
@@ -57,6 +59,7 @@ export default {
 			}
 		},
 		runCommand() {
+			ipcRenderer.send('command-will-run', this.entry + this.globaloption + this.command);
 			actions.addHistory(store, this.entry + this.globaloption + this.command);
 		},
 		openUrl: openUrl
