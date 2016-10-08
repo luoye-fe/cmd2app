@@ -33,6 +33,7 @@
 </style>
 <script>
 import { ipcRenderer } from 'electron';
+import { copyObj } from '../utils/common.js';
 
 export default {
 	name: 'RequireSudoPwd',
@@ -51,7 +52,7 @@ export default {
 			}
 			ipcRenderer.send('app-init-input-pwd', this.pwd);
 			setTimeout(() => {
-				ipcRenderer.send('app-init-will-check', this.metaJson);
+				ipcRenderer.send('app-init-will-check', copyObj(this.metaJson));
 			}, 0);
 		}
 	}

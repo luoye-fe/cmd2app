@@ -39,7 +39,7 @@ export default {
 			this.entry = this.cmd.entry;
 			Object.keys(this.cmd.globalOptions).forEach((item) => {
 				let curOption = this.cmd.globalOptions[item];
-				this.globaloption += ` --${item}=${curOption.value}`;
+				curOption.value === '' ? this.globaloption += ` --${item}` : this.globaloption += ` --${item}=${curOption.value}`;
 			});
 			if (this.cmd.command.key) {
 				this.command += this.cmd.command.key;
@@ -51,7 +51,7 @@ export default {
 				if (this.cmd.command.options) {
 					Object.keys(this.cmd.command.options).forEach((item) => {
 						let curOption = this.cmd.command.options[item];
-						this.command += ` --${item}=${curOption.value}`;
+						curOption.value === '' ? this.command += ` --${item}` : this.command += ` --${item}=${curOption.value}`;
 					});
 				}
 			}

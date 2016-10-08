@@ -152,7 +152,6 @@ export default {
 	},
 	ready() {
 		ipcRenderer.on('app-init-has-check', (ev, result) => {
-			console.log(result);
 			if (result.error) {
 				this.showModal = true;
 			} else {
