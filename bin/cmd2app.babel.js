@@ -2,9 +2,7 @@
 
 // babel entrance
 require('babel-core/register')({
-	"presets": ["es2015", "stage-2"],
-	"plugins": ["transform-runtime"],
-	"comments": false
+	ignore: false
 });
 
 require('./cmd2app.js');
