@@ -3,5 +3,5 @@
 	"plugins": ["transform-runtime"],
 	"comments": false,
 	"compact": false,
-	"only": ["./bin/*", "./config/*", "./webpack/*", "./template/*", "./electron/*", "./static/*", "./temp/*"]
+	"only": ["./bin/*", "./config/*", "./webpack/*", "./template/*", "./electron/*", "./static/*"]
 }
