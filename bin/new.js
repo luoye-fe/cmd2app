@@ -34,9 +34,11 @@ process.on('exit', function() {
 })
 
 let repoName = program.args[0];
-let generatePath = path.join(process.cwd(), program.args[1]);
-let generateSrcPath = path.join(process.cwd(), program.args[1], 'src');
-let generateReourcePath = path.join(process.cwd(), program.args[1], 'src', 'resource');
+let targetPath = program.args[1];
+let prefix = path.isAbsolute(targetPath) ? '' : process.cwd();
+let generatePath = path.join(prefix, targetPath);
+let generateSrcPath = path.join(prefix, targetPath, 'src');
+let generateReourcePath = path.join(prefix, targetPath, 'src', 'resource');
 
 const run = async function() {
 	await checkDistBranch(repoName);
