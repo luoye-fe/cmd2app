@@ -16,6 +16,7 @@ npm-debug.log
 
 # custom
 template/render/*
+!template/render/.empty
 template/resource
 config/custom.config.js
 temp/
