@@ -81,7 +81,8 @@ if (env === 'production') {
     webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({
         compress: {
             warnings: false
-        }
+        },
+        sourceMap: false
     }));
 }
 
