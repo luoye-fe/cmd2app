@@ -20,4 +20,3 @@ template/render/*
 template/resource
 config/custom.config.js
 temp/
-static.bak/
