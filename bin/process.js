@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { exec } from 'child_process';
 
+import webpack from 'webpack';
 import download from 'download-git-repo';
 import ora from 'ora';
 import request from 'request';
@@ -11,6 +12,8 @@ import { js as jsbeautify } from 'js-beautify';
 
 import merge from './merge-pkg.js';
 import logger from './logger.js';
+
+import webpackConfig from '../webpack/webpack.config.js';
 
 export const checkDistBranch = function(template) {
 	return new Promise((resolve, reject) => {
@@ -67,15 +70,16 @@ export const checkLegal = function(targetPath) {
 	})
 };
 
-export const buildStatic = function() {
+export const buildStatic = function(targetPath) {
 	return new Promise((resolve, reject) => {
 		let spinner = ora('Building static ...').start();
-		exec(`cd ${path.join(__dirname, '../')} && node webpack/webpack.babel.js`, (error, stdout, stderr) => {
+		webpackConfig.output.path = path.join(targetPath, 'render');
+		webpack(webpackConfig, function(err, stats) {
 			spinner.stop();
-			if (error) {
+			if (err) {
 				reject(error);
 				logger.fatal(error);
-			}
+			};
 			logger.success('Build static succeed.');
 			resolve();
 		});

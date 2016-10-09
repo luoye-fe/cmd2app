@@ -42,7 +42,7 @@ const run = async function() {
 	await checkDistBranch(repoName);
 	await downloadGitRepo(repoName, generateReourcePath);
 	await checkLegal(generateReourcePath);
-	await buildStatic();
+	await buildStatic(generateSrcPath);
 	await copyElectronTemplate(generateSrcPath);
 	await generateMeatFile(generateReourcePath, repoName);
 	await mergePackage(generateReourcePath);
