@@ -1,7 +1,13 @@
-cmd2app - Convert you command line client to electron app.
+cmd2app - Convert you command line client to electron app.  
 =================
 
-## How to do?
+## Install
+
+```bash
+(sudo) npm install cmd2app -g
+```
+
+## How to convert?
 
 * Complete your command line client.
 
