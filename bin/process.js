@@ -12,6 +12,7 @@ import { js as jsbeautify } from 'js-beautify';
 
 import merge from './merge-pkg.js';
 import logger from './logger.js';
+import { babelDir } from './utils.js';
 
 import webpackConfig from '../webpack/webpack.config.js';
 
@@ -86,18 +87,20 @@ export const buildStatic = function(targetPath) {
 	})
 };
 
-export const copyElectronTemplate = function(targetPath) {
+export const buildMainUseBabel = function(targetPath) {
 	return new Promise((resolve, reject) => {
-		let spinner = ora('Copying file ...').start();
-		ncp(path.join(__dirname, '../', 'template/'), targetPath, function(err) {
-			spinner.stop();
-			if (err) {
+		let spinner = ora('Transform file by babel ...').start();
+		babelDir(path.join(__dirname, '../', 'template/main'), path.join(targetPath, './main'))
+			.then(() => {
+				spinner.stop();
+				logger.success('Transform file succeed.');
+				resolve();
+			})
+			.catch((err) => {
+				spinner.stop();
 				reject(err);
 				logger.fatal(err);
-			}
-			logger.success('Copy file succeed.');
-			resolve();
-		});
+			})
 	})
 };
 
@@ -117,7 +120,7 @@ export const generateMeatFile = function(targetPath, repoName) {
 			}
 			// replace `title` info
 			let indexHTMLPath = path.join(targetPath, '../', 'index.html');
-			fs.writeFileSync(indexHTMLPath, fs.readFileSync(indexHTMLPath, 'utf-8').replace(/\{\{title\}\}/, cmd2appJSON.title || 'cmd2app'));
+			fs.writeFileSync(indexHTMLPath, fs.readFileSync(path.join(__dirname, '../', 'template/index.html'), 'utf-8').replace(/\{\{title\}\}/, cmd2appJSON.title || 'cmd2app'));
 			resolve();
 		});
 	})
@@ -126,9 +129,9 @@ export const generateMeatFile = function(targetPath, repoName) {
 export const mergePackage = function(targetPath) {
 	return new Promise((resolve, reject) => {
 		let resourcePkg = fs.readFileSync(path.join(targetPath, 'package.json'));
-		let mainPkg = fs.readFileSync(path.join(targetPath, '../package.json'));
+		let mainPkg = fs.readFileSync(path.join(__dirname, '../', 'template/package.json'));
 		let resultPkg = JSON.parse(merge(mainPkg, resourcePkg));
-		resultPkg.main = './main/app.babel.js';
+		resultPkg.main = './main/app.js';
 		fs.writeFile(path.join(targetPath, '../package.json'), jsbeautify(JSON.stringify(resultPkg), {
 			'indent_with_tabs': true,
 			'indent_size': 4,
