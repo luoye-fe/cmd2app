@@ -132,6 +132,9 @@ export const mergePackage = function(targetPath) {
 		let mainPkg = fs.readFileSync(path.join(__dirname, '../', 'template/package.json'));
 		let resultPkg = JSON.parse(merge(mainPkg, resourcePkg));
 		resultPkg.main = './main/app.js';
+		resultPkg.fet = {
+			type: 'app'
+		}
 		fs.writeFile(path.join(targetPath, '../package.json'), jsbeautify(JSON.stringify(resultPkg), {
 			'indent_with_tabs': true,
 			'indent_size': 4,
