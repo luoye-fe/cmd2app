@@ -166,12 +166,15 @@ export const installNodeModule = function(targetPath) {
 export const buildAsar = function(targetPath) {
 	return new Promise((resolve, reject) => {
 		let spinner = ora('Building asar ...').start();
-		if (fs.existsSync(path.join(targetPath, './dist/asar/app.asar'))) {
-			fs.unlinkSync(path.join(targetPath, './dist/asar/app.asar'));
+		if (fs.existsSync(path.join(targetPath, '../dist/app.asar'))) {
+			fs.unlinkSync(path.join(targetPath, '../dist/app.asar'));
 		}
-		asar.createPackage(targetPath, path.join(targetPath, '../dist/asar/app.asar'), function() {
+		asar.createPackage(targetPath, path.join(targetPath, '../dist/app.asar'), function() {
+			fs.writeFileSync(path.join(targetPath, '../dist/package.json'), JSON.stringify({
+				main: './app.asar/main/app.js'
+			}))
 			spinner.stop();
-			logger.success(`Build asar succeed. app.asar in ${path.join(targetPath, '../dist/asar/app.asar')}`);
+			logger.success(`Build asar succeed. app.asar in ${path.join(targetPath, '../dist/app.asar')}`);
 			resolve();
 		})
 	})
