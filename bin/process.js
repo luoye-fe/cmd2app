@@ -170,10 +170,13 @@ export const buildAsar = function(targetPath) {
 			fs.unlinkSync(path.join(targetPath, '../dist/app.asar'));
 		}
 		asar.createPackage(targetPath, path.join(targetPath, '../dist/app.asar'), function() {
-			let resourcePkg = fs.readFileSync(path.join(targetPath, '../src/package.json'));
-			fs.writeFileSync(path.join(targetPath, '../dist/package.json'), JSON.stringify(Object.assign({
+			let resourcePkg = fs.readFileSync(path.join(targetPath, '../src/package.json'), 'utf-8');
+			fs.writeFileSync(path.join(targetPath, '../dist/package.json'), jsbeautify(JSON.stringify(Object.assign({
 				main: './app.asar/main/app.js'
-			}, resourcePkg)))
+			}, resourcePkg))), {
+				'indent_with_tabs': true,
+				'indent_size': 4
+			})
 			spinner.stop();
 			logger.success(`Build asar succeed. app.asar in ${path.join(targetPath, '../dist/app.asar')}`);
 			resolve();
