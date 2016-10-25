@@ -1,6 +1,6 @@
 {
   "name": "cmd2app",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "",
   "main": "./bin/cmd2app.babel.js",
   "bin": {
