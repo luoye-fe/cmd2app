@@ -163,22 +163,24 @@ export const installNodeModule = function(targetPath) {
 	})
 };
 
-export const buildAsar = function(targetPath) {
+export const buildZip = function(targetPath) {
 	return new Promise((resolve, reject) => {
-		let spinner = ora('Building asar ...').start();
-		if (fs.existsSync(path.join(targetPath, '../dist/app.asar'))) {
-			fs.unlinkSync(path.join(targetPath, '../dist/app.asar'));
+		let spinner = ora('Building zip ...').start();
+		if (fs.existsSync(path.join(targetPath, '../dist/app.zip'))) {
+			fs.unlinkSync(path.join(targetPath, '../dist/app.zip'));
 		}
-		asar.createPackage(targetPath, path.join(targetPath, '../dist/app.asar'), function() {
+		if (!fs.existsSync(path.join(targetPath, '../dist'))) {
+			fs.mkdirSync(path.join(targetPath, '../dist'));
+		}
+		exec(`zip '${path.join(targetPath, '../dist/app.zip')}' -r '${targetPath}' -q`, (error) => {
 			let resourcePkg = fs.readFileSync(path.join(targetPath, '../src/package.json'), 'utf-8');
-			fs.writeFileSync(path.join(targetPath, '../dist/package.json'), jsbeautify(JSON.stringify(Object.assign(JSON.parse(resourcePkg), {
-				main: './app.asar/main/app.js'
-			}))), {
-				'indent_with_tabs': true,
-				'indent_size': 4
-			})
+			fs.writeFileSync(path.join(targetPath, '../dist/package.json'), resourcePkg);
 			spinner.stop();
-			logger.success(`Build asar succeed. app.asar in ${path.join(targetPath, '../dist/app.asar')}`);
+			if (error) {
+				reject(error);
+				logger.fatal(error);
+			}
+			logger.success(`Build zip succeed. app.zip in ${path.join(targetPath, '../dist/app.zip')}`);
 			resolve();
 		})
 	})

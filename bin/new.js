@@ -7,7 +7,7 @@ import inquirer from 'inquirer';
 
 import { isEmptySync } from './utils.js';
 import logger from './logger.js';
-import { checkDistBranch, downloadGitRepo, checkLegal, generateMeatFile, buildStatic, buildMainUseBabel, mergePackage, installNodeModule, buildAsar } from './process.js';
+import { checkDistBranch, downloadGitRepo, checkLegal, generateMeatFile, buildStatic, buildMainUseBabel, mergePackage, installNodeModule, buildZip } from './process.js';
 
 program
 	.usage('<repo-name> [path]')
@@ -49,7 +49,7 @@ const run = async function() {
 	await generateMeatFile(generateReourcePath, repoName);
 	await mergePackage(generateReourcePath);
 	await installNodeModule(generateSrcPath);
-	await buildAsar(generateSrcPath);
+	await buildZip(generateSrcPath);
 	logger.success('All succeed.');
 }
 
