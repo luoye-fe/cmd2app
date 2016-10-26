@@ -172,7 +172,7 @@ export const buildZip = function(targetPath) {
 		if (!fs.existsSync(path.join(targetPath, '../dist'))) {
 			fs.mkdirSync(path.join(targetPath, '../dist'));
 		}
-		exec(`zip '${path.join(targetPath, '../dist/app.zip')}' -r '${targetPath}' -q`, (error) => {
+		exec(`cd '${targetPath}' && zip '${path.join(targetPath, '../dist/app.zip')}' -r ./ -q`, (error) => {
 			let resourcePkg = fs.readFileSync(path.join(targetPath, '../src/package.json'), 'utf-8');
 			fs.writeFileSync(path.join(targetPath, '../dist/package.json'), resourcePkg);
 			spinner.stop();
