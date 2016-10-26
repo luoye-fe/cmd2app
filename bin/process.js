@@ -171,9 +171,9 @@ export const buildAsar = function(targetPath) {
 		}
 		asar.createPackage(targetPath, path.join(targetPath, '../dist/app.asar'), function() {
 			let resourcePkg = fs.readFileSync(path.join(targetPath, '../src/package.json'), 'utf-8');
-			fs.writeFileSync(path.join(targetPath, '../dist/package.json'), jsbeautify(JSON.stringify(Object.assign({
+			fs.writeFileSync(path.join(targetPath, '../dist/package.json'), jsbeautify(JSON.stringify(Object.assign(JSON.parse(resourcePkg), {
 				main: './app.asar/main/app.js'
-			}, JSON.parse(resourcePkg)))), {
+			}))), {
 				'indent_with_tabs': true,
 				'indent_size': 4
 			})
