@@ -12,9 +12,9 @@ let sudo_pwd = '';
 function apply(success, fail) {
     let cmd = '';
     if (platform !== 'win32') {
-        cmd = `cd ${resourcePath} && echo ${sudo_pwd} | sudo -S npm link`;
+        cmd = `cd '${resourcePath}' && echo ${sudo_pwd} | sudo -S npm link`;
     } else {
-        cmd = `cd ${resourcePath} && npm link`;
+        cmd = `cd '${resourcePath}' && npm link`;
     }
     exec(cmd, (err, stdout, stderr) => {
         if (err) {
