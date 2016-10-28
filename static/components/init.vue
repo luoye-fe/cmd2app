@@ -137,6 +137,9 @@ import { copyObj } from '../utils/common.js';
 
 import RequireSudoPwd from './require-sudo-pwd.vue';
 
+import actions from 'actions';
+import store from 'store';
+
 export default {
 	name: 'Init',
 	data() {
@@ -152,8 +155,16 @@ export default {
 	},
 	ready() {
 		ipcRenderer.on('app-init-has-check', (ev, result) => {
-			if (result.error) {
+			if (result.error && result.type === 'nopwd') {
 				this.showModal = true;
+			} else if (result.error && result.type === 'nonpm') {
+				actions.alert(store, {
+					show: true,
+					type: 'warning',
+					title: '提示',
+					msg: '需在本地安装npm！',
+					duration: 10000
+				})
 			} else {
 				this.tips = '初始化完成';
 				this.showInit = false;
