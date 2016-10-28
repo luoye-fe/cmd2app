@@ -5,6 +5,9 @@ export const copyObj = (source) => {
 };
 
 export const normalizePath = (path) => {
+	if (/\s/.test(path)) {
+		path = "'" + path + "'";
+	}
 	return path.replace(/\\/g, '/');
 };
 

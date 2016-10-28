@@ -21,9 +21,9 @@ function apply(success, fail) {
 	let cmd = '';
 	let curr = normalizePath(resourcePath);
 	if (platform !== 'win32') {
-		cmd = `cd "${curr}" && echo ${sudoPwd} | sudo -S npm link`;
+		cmd = `cd ${curr} && echo ${sudoPwd} | sudo -S npm link`;
 	} else {
-		cmd = `cd "${curr}" && npm link`;
+		cmd = `cd ${curr} && npm link`;
 	}
 	execCmd(cmd, (err, stdout, stderr) => {
 		if (err) {
