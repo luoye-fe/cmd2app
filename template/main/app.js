@@ -1,3 +1,7 @@
+// fix process.env.path on darwin
+import fixPath from 'fix-path';
+fixPath();
+
 import path from 'path';
 import { app, BrowserWindow, Tray, Menu } from 'electron';
 
@@ -9,7 +13,6 @@ let mainWindow = null;
 let appIcon = null;
 let forceQuit = false;
 let indexPath = `file://${path.join(__dirname, '../index.html')}`;
-
 
 let browserOptions = {
 	width: 717,

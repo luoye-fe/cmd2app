@@ -1,80 +1,100 @@
 import path from 'path';
-import { exec } from 'child_process';
 
-import { ipcMain } from 'electron';
+import { ipcMain, dialog } from 'electron';
 
-import commandExists from 'command-exists';
+import { commandExists } from '../utils/command-exists.js';
+
+import { normalizePath, execCmd } from '../utils/common.js';
 
 const platform = process.platform;
 const resourcePath = path.join(__dirname, '../../resource');
-let sudo_pwd = '';
+let sudoPwd = '';
+
+let dialogInfoObj = {
+	type: 'info',
+	buttons: [],
+	title: '提示',
+	message: '提示信息'
+};
 
 function apply(success, fail) {
-    let cmd = '';
-    if (platform !== 'win32') {
-        cmd = `cd '${resourcePath}' && echo ${sudo_pwd} | sudo -S npm link`;
-    } else {
-        cmd = `cd '${resourcePath}' && npm link`;
-    }
-    exec(cmd, (err, stdout, stderr) => {
-        if (err) {
-            fail();
-            return;
-        }
-        success();
-    });
+	let cmd = '';
+	let curr = normalizePath(resourcePath);
+	if (platform !== 'win32') {
+		cmd = `cd "${curr}" && echo ${sudoPwd} | sudo -S npm link`;
+	} else {
+		cmd = `cd "${curr}" && npm link`;
+	}
+	execCmd(cmd, (err, stdout, stderr) => {
+		if (err) {
+			fail();
+			return;
+		}
+		success();
+	});
 }
 
 function tryToApply(ev) {
-    apply(() => {
-        // success
-        ev.sender.send('app-init-has-check', {
-            error: 0
-        });
-    }, () => {
-        // fail
-        ev.sender.send('app-init-has-check', {
-            error: 1
-        });
-    })
+	apply(() => {
+		// success
+		ev.sender.send('app-init-has-check', {
+			error: 0
+		});
+	}, () => {
+		// fail
+		ev.sender.send('app-init-has-check', {
+			error: 1,
+			type: 'nopwd'
+		});
+	});
 }
 
 function checkCommand(metaJSON) {
-    return new Promise((resolve, reject) => {
-        let cur = 0;
-        for (let i = 0; i < metaJSON.bin.length; i++) {
-            (function(j) {
-                commandExists(metaJSON.bin[j], (err, exist) => {
-                    if (!exist) {
-                        resolve();
-                        return;
-                    } else {
-                        cur++;
-                        if (cur === metaJSON.bin.length) {
-                            reject();
-                        }
-                    }
-                })
-            })(i)
-        }
-    })
+	return new Promise((resolve, reject) => {
+		let cur = 0;
+		for (let i = 0; i < metaJSON.bin.length; i++) {
+			(function(j) {
+				commandExists(metaJSON.bin[j], (err, exist) => {
+					if (!exist) {
+						resolve();
+						return;
+					} else {
+						cur++;
+						if (cur === metaJSON.bin.length) {
+							reject();
+						}
+					}
+				});
+			})(i);
+		}
+	});
 }
 
 ipcMain.on('app-init-will-check', (ev, metaJSON) => {
-    let result = {};
-    let cur = false;
+	commandExists('npm', (err, exist) => {
+		if (!exist) {
+			ev.sender.send('app-init-has-check', {
+				error: 1,
+				type: 'nonpm',
+				msg: 'You should install npm.'
+			});
+			return;
+		}
+		let result = {};
+		let cur = false;
 
-    checkCommand(metaJSON)
-        .then(() => {
-            tryToApply(ev);
-        })
-        .catch(() => {
-            ev.sender.send('app-init-has-check', {
-                error: 0
-            });
-        })
+		checkCommand(metaJSON)
+			.then(() => {
+				tryToApply(ev);
+			})
+			.catch(() => {
+				ev.sender.send('app-init-has-check', {
+					error: 0
+				});
+			});
+	});
 });
 
 ipcMain.on('app-init-input-pwd', (ev, pwd) => {
-    sudo_pwd = pwd;
-})
+	sudoPwd = pwd;
+});
