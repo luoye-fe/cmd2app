@@ -42,7 +42,7 @@ function createWindow() {
 	}
 
 	mainWindow.on('close', (e) => {
-		if (!forceQuit) {
+		if (!forceQuit && process.platform === 'darwin') {
 			e.preventDefault();
 			mainWindow.hide();
 			return;
