@@ -7,3 +7,5 @@ export const addNewOption = (store, params, command) => store.dispatch('ADDNEWOP
 export const delOption = (store, index) => store.dispatch('DELOPTION', index);
 
 export const addCommand = (store, params) => store.dispatch('ADDCOMMAND', params);
+
+export const updateWholeCMD = (store, cmd) => store.dispatch('UPDATEWHOLECMD', cmd);

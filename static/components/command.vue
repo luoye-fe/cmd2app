@@ -4,7 +4,7 @@
 		<div class="checked-command">
 			<div class="row">
 				<div class="col-xs-3">
-					<select class="form-control" @change="selectCommand($event)" :disabled="disabled">
+					<select class="form-control" @change="selectCommand($event)" v-model="checkedCommand" :disabled="disabled">
 						<option value="null">无</option>
 						<option v-for="(key, item) in metaJSON.command" :value="key">{{key}}</option>
 					</select>
@@ -62,12 +62,14 @@ export default {
 			showAddOptionButton: false,
 			currentCommand: {},
 			currentEntry: '',
-			disabled: false
+			disabled: false,
+			checkedCommand: ''
 		};
 	},
 	vuex: {
 		getters: {
-			metaJSON: () => store.state.metaJSON
+			metaJSON: () => store.state.metaJSON,
+			command: () => store.state.cmd.command
 		}
 	},
 	components: {
@@ -102,6 +104,13 @@ export default {
 		}
 	},
 	watch: {
+		'command': {
+			handler() {
+				this.checkedCommand = this.command.key;
+				Vue.set(this.currentCommand, 'params', this.command.params);
+				Vue.set(this.currentCommand, 'options', this.command.options);
+			}
+		},
 		'currentCommand': {
 			handler() {
 				this.showAddOptionButton = !!(this.currentCommand.options);

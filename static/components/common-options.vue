@@ -41,6 +41,12 @@ export default {
 			currentOption: []
 		};
 	},
+	vuex: {
+		getters: {
+			globalOptions: () => store.state.cmd.globalOptions,
+			commandOptions: () => store.state.cmd.command.options
+		}
+	},
 	props: ['allOptions', 'isCommand', 'disabled'],
 	ready() {
 		Event.$on('applyAllOption', (isFromEvent) => {
@@ -108,6 +114,42 @@ export default {
 				}
 			})
 			actions.addNewOption(store, cur, this.isCommand);
+		}
+	},
+	watch: {
+		globalOptions: {
+			handler() {
+				if (!this.isCommand) {
+					this.currentOption = [];
+					Object.keys(this.globalOptions).forEach((item) => {
+						this.currentOption.push({
+							checked: item,
+							value: this.globalOptions[item].value,
+							desc: this.allOptions[item].desc,
+							disabled: false
+						});
+					});
+				}
+			},
+			deep: true
+		},
+		commandOptions: {
+			handler() {
+				setTimeout(() => {
+					if (this.isCommand) {
+						this.currentOption = [];
+						Object.keys(this.commandOptions).forEach((item) => {
+							this.currentOption.push({
+								checked: item,
+								value: this.commandOptions[item].value,
+								desc: this.allOptions[item].desc,
+								disabled: false
+							});
+						});
+					}
+				}, 1);
+			},
+			deep: true
 		}
 	}
 };

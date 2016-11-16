@@ -2,7 +2,7 @@
 	<div class="form-group form-group-sm">
 		<label>Entry</label>
 		<div class="con">
-			<select @change="updateEntry($event)" class="form-control">
+			<select @change="updateEntry($event)" v-model="checkedEntry" class="form-control">
 				<option v-for="key in metaJSON.bin" :value="key">{{key}}</option>
 			</select>
 			<div v-show="platform === 'darwin'">
@@ -23,16 +23,19 @@ export default {
 	data() {
 		return {
 			platform: process.platform,
-			sudo: false
+			sudo: false,
+			checkedEntry: ''
 		}
 	},
 	vuex: {
 		getters: {
 			metaJSON: () => store.state.metaJSON,
-			entry: () => store.state.cmd.entry
+			entry: () => store.state.cmd.entry,
+			commandSudo: () => store.state.cmd.sudo
 		}
 	},
 	ready() {
+		this.checkedEntry = this.metaJSON.bin[0];
 		actions.updateEntry(store, this.metaJSON.bin[0]);
 	},
 	methods: {
@@ -41,6 +44,18 @@ export default {
 		},
 		updateSudo() {
 			actions.updateSudo(store, this.sudo);
+		}
+	},
+	watch: {
+		entry: {
+			handler() {
+				this.checkedEntry = this.entry;
+			}
+		},
+		commandSudo: {
+			handler() {
+				this.sudo = this.commandSudo;
+			}
 		}
 	}
 };

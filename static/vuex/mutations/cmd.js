@@ -27,3 +27,7 @@ export const DELOPTION = (state, key, command) => {
 export const ADDCOMMAND = (state, params) => {
 	state.cmd.command = params;
 };
+
+export const UPDATEWHOLECMD = (state, cmd) => {
+	state.cmd = cmd;
+};

@@ -13,11 +13,12 @@
 				<tr v-for="(index, item) in commandHistory" track-by="$index">
 					<th scope="row">{{index + 1}}</th>
 					<td class="table-code">
-						<span>{{item}}</span>
+						<span>{{item.sudo + item.entry + item.globalOptions + item.command}}</span>
 					</td>
 					<td class="opt-button">
 						<div>
 							<button type="button" class="btn btn-danger btn-sm" @click="delCommand(index)">删除</button>
+							<button type="button" class="btn btn-info btn-sm" @click="modifyCommand(item)">修改</button>
 							<button type="button" class="btn btn-success btn-sm" @click="runCommand(item)">运行</button>
 						</div>
 					</td>
@@ -73,6 +74,8 @@ import actions from 'actions';
 
 import { ipcRenderer } from 'electron';
 
+import Event from './event.vue';
+
 export default {
 	name: 'History',
 	vuex: {
@@ -84,8 +87,11 @@ export default {
 		delCommand(index) {
 			actions.delHistory(store, index);
 		},
+		modifyCommand(item) {
+			actions.updateWholeCMD(store, item.cmd);
+		},
 		runCommand(item) {
-			ipcRenderer.send('command-will-run', item);
+			ipcRenderer.send('command-will-run',  item.sudo + item.entry + item.globalOptions + item.command);
 		}
 	}
 };
