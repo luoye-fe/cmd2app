@@ -153,6 +153,9 @@ export default {
 		ipcRenderer.on('command-close', (ev, pid) => {
 			this.clients[pid].status = 'close';
 		})
+		// ipcRenderer.on('app-before-quit', (ev) => {
+		// 	ipcRenderer.send('app-before-quit-clients', this.clients);
+		// })
 	},
 	methods: {
 		toggleClient() {
@@ -172,7 +175,7 @@ export default {
 		},
 		apply() {
 			ipcRenderer.send('command-force-close', this.willCloseKey);
-			this.clients[this.willCloseKey].data += '\nprocess close.';
+			this.clients[this.willCloseKey].data += '\nprocess close.\n';
 			this.showModal = false;
 		}
 	},

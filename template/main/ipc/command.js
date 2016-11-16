@@ -2,35 +2,58 @@ import { ipcMain, BrowserWindow } from 'electron';
 
 import { execCmd } from '../utils/common.js';
 
-ipcMain.on('command-will-run', (ev, command) => {
+import { spawn } from 'child_process';
+
+let sudoPwd = '';
+let resultCommand = '';
+
+ipcMain.on('command-will-run', (ev, command, pwd) => {
+	let preCommand = command;
+	if (pwd) {
+		sudoPwd = pwd;
+	}
+	if (/^sudo/.test(command)) {
+		command = `echo ${sudoPwd} | ${command.replace('sudo', 'sudo -S')}`;
+	}
+	resultCommand = command;
 	let child = execCmd(command);
 	let pid = child.pid;
 	ev.sender.send('command-begin', pid);
 	child.stdout.on('data', (data) => {
-		// console.log(`stdout: ${data}`);
 		ev.sender.send('command-runing', {
 			data: data,
 			pid: pid
 		});
 	});
 	child.stderr.on('data', (data) => {
-		// console.log(`stderr: ${data}`);
+		if (data && !sudoPwd) {
+			ev.sender.send('command-require-sudo', preCommand);
+			sudoPwd = '';
+			return;
+		}
 		ev.sender.send('command-runing', {
 			data: data,
 			pid: pid
 		});
 	});
 	child.on('close', (code) => {
-		// console.log(`Child exited with code ${code}`);
 		ev.sender.send('command-close', pid);
 	});
-	child.on('error', () => {
-		// console.log(`error: ${data}`);
+	child.on('error', (err) => {
+		console.log(`error: ${err}`);
 	});
 });
 
 ipcMain.on('command-force-close', (ev, pid) => {
-	try {
-		process.kill(pid);
-	} catch (e) {}
+	if ((sudoPwd && process.platform === 'darwin') || /^echo/.test(resultCommand)) {
+		execCmd(`echo ${sudoPwd} | sudo -S kill -9 ${pid}`, () => {
+			execCmd(`echo ${sudoPwd} | sudo -S kill -9 ${parseInt(pid) + 2}`, () => {
+				execCmd(`echo ${sudoPwd} | sudo -S kill -9 ${parseInt(pid) + 2 + 1}`);
+			});
+		});
+	} else {
+		try {
+			process.kill(pid);
+		} catch (e) {}
+	}
 });

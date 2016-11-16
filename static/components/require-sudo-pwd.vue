@@ -17,7 +17,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal" @click="showModal = false">取消</button>
-					<button type="button" class="btn btn-primary" @click="apply()">确认</button>
+					<button type="button" class="btn btn-primary" @click="applySudoPwd()">确认</button>
 				</div>
 			</div>
 		</div>
@@ -43,17 +43,11 @@ export default {
 			pwd: ''
 		};
 	},
-	props: ['showModal', 'metaJson'],
+	props: ['showModal', 'apply'],
 	methods: {
-		apply() {
+		applySudoPwd() {
 			this.showModal = false;
-			if (process.platform === 'win32') {
-				return;
-			}
-			ipcRenderer.send('app-init-input-pwd', this.pwd);
-			setTimeout(() => {
-				ipcRenderer.send('app-init-will-check', copyObj(this.metaJson));
-			}, 0);
+			this.apply(this.pwd);
 		}
 	}
 };

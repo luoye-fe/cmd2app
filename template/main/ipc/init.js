@@ -26,7 +26,7 @@ function apply(success, fail) {
 		cmd = `cd ${curr} && npm link`;
 	}
 	execCmd(cmd, (err, stdout, stderr) => {
-		if (err) {
+		if (err && !sudoPwd) {
 			fail();
 			return;
 		}
@@ -41,7 +41,7 @@ function tryToApply(ev) {
 			error: 0
 		});
 	}, () => {
-		// fail
+		// fail require sudo pwd
 		ev.sender.send('app-init-has-check', {
 			error: 1,
 			type: 'nopwd'

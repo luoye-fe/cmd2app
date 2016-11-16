@@ -11,9 +11,63 @@
 				<p>{{tips}}</p>
 			</div>
 		</div>
-		<m-require-sudo-pwd :show-modal.sync="showModal" :meta-json="metaJSON"></m-require-sudo-pwd>
+		<m-require-sudo-pwd :show-modal.sync="showModal" :apply="apply"></m-require-sudo-pwd>
 	</div>
 </template>
+<script>
+import { ipcRenderer } from 'electron';
+
+import { copyObj } from '../utils/common.js';
+
+import RequireSudoPwd from './require-sudo-pwd.vue';
+
+import actions from 'actions';
+import store from 'store';
+
+export default {
+	name: 'Init',
+	data() {
+		return {
+			showInit: true,
+			tips: '正在初始化 ...',
+			showModal: false,
+			metaJSON: window.metaJSON,
+			apply(pwd) {
+				if (process.platform === 'win32') {
+					return;
+				}
+				ipcRenderer.send('app-init-input-pwd', pwd);
+				let obj = copyObj(this.metaJson)
+				setTimeout(() => {
+					ipcRenderer.send('app-init-will-check', obj);
+				}, 0);
+			}
+		};
+	},
+	components: {
+		'm-require-sudo-pwd': RequireSudoPwd
+	},
+	ready() {
+		ipcRenderer.on('app-init-has-check', (ev, result) => {
+			if (result.error && result.type === 'nopwd') {
+				this.showModal = true;
+			} else if (result.error && result.type === 'nonpm') {
+				actions.alert(store, {
+					show: true,
+					type: 'warning',
+					title: '提示',
+					msg: '需在本地安装npm！',
+					duration: 10000
+				})
+			} else {
+				this.tips = '初始化完成';
+				this.showInit = false;
+			}
+		})
+		ipcRenderer.send('app-init-will-check', copyObj(window.metaJSON));
+	}
+};
+</script>
 <style scoped>
 .init {
 	position: fixed;
@@ -130,47 +184,3 @@
 	}
 }
 </style>
-<script>
-import { ipcRenderer } from 'electron';
-
-import { copyObj } from '../utils/common.js';
-
-import RequireSudoPwd from './require-sudo-pwd.vue';
-
-import actions from 'actions';
-import store from 'store';
-
-export default {
-	name: 'Init',
-	data() {
-		return {
-			showInit: true,
-			tips: '正在初始化 ...',
-			showModal: false,
-			metaJSON: window.metaJSON
-		};
-	},
-	components: {
-		'm-require-sudo-pwd': RequireSudoPwd
-	},
-	ready() {
-		ipcRenderer.on('app-init-has-check', (ev, result) => {
-			if (result.error && result.type === 'nopwd') {
-				this.showModal = true;
-			} else if (result.error && result.type === 'nonpm') {
-				actions.alert(store, {
-					show: true,
-					type: 'warning',
-					title: '提示',
-					msg: '需在本地安装npm！',
-					duration: 10000
-				})
-			} else {
-				this.tips = '初始化完成';
-				this.showInit = false;
-			}
-		})
-		ipcRenderer.send('app-init-will-check', copyObj(window.metaJSON));
-	}
-};
-</script>

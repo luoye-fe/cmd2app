@@ -3,7 +3,7 @@ import fixPath from 'fix-path';
 fixPath();
 
 import path from 'path';
-import { app, BrowserWindow, Tray, Menu } from 'electron';
+import { app, BrowserWindow, Tray, Menu, ipcMain } from 'electron';
 
 import './ipc/index.js';
 
@@ -65,5 +65,10 @@ app.on('activate', function() {
 });
 
 app.on('before-quit', function() {
+	// mainWindow.webContents.send('app-before-quit');
+	// ipcMain.once('app-before-quit-clients', (ev, clients) => {
+	// 	console.log(clients);
+	// 	forceQuit = true;
+	// });
 	forceQuit = true;
 });
