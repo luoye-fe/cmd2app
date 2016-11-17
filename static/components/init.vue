@@ -28,12 +28,12 @@ export default {
 	data() {
 		return {
 			showInit: true,
-			tips: '正在初始化 ...',
-			metaJSON: window.metaJSON
+			tips: '正在初始化 ...'
 		};
 	},
 	vuex: {
 		getters: {
+			metaJSON: () => store.state.metaJSON,
 			sudoPwd: () => store.state.sudoPwd
 		}
 	},
@@ -78,7 +78,7 @@ export default {
 <style scoped>
 .init {
 	position: fixed;
-	z-index: 9999;
+	z-index: 1049;
 	top: 0;
 	left: 0;
 	width: 100%;
