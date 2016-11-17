@@ -1,5 +1,9 @@
 <template>
 	<div class="form-group form-group-sm">
+		<div class="button-group">
+			<button type="button" class="btn btn-success btn-sm" @click="applyAll()">确认所有参数</button>
+		</div>
+		<hr>
 		<label>Result</label>
 		<pre><code>{{cmdStr}}</code></pre>
 		<hr>
@@ -103,6 +107,10 @@ export default {
 		openUrl: openUrl,
 		apply(pwd) {
 			ipcRenderer.send('command-will-run', this.requireSudoCmdStr, pwd);
+		},
+		applyAll() {
+			Event.$emit('i-will-recive-all');
+			Event.$emit('should-generate');
 		}
 	}
 };
