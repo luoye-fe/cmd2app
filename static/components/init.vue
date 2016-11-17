@@ -59,7 +59,7 @@ export default {
 				this.showInit = false;
 			}
 		})
-		ipcRenderer.send('app-init-will-check', copyObj(window.metaJSON));
+		ipcRenderer.send('app-init-will-check', copyObj(this.metaJSON));
 	},
 	methods: {
 		apply(pwd) {
@@ -67,7 +67,7 @@ export default {
 				return;
 			}
 			ipcRenderer.send('app-init-input-pwd', pwd);
-			let obj = copyObj(this.metaJson)
+			let obj = copyObj(this.metaJSON)
 			setTimeout(() => {
 				ipcRenderer.send('app-init-will-check', obj);
 			}, 0);
