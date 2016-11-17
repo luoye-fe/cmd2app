@@ -4,27 +4,85 @@
 		<div class="checked-command">
 			<div class="row">
 				<div class="col-xs-3">
-					<select class="form-control" @change="selectCommand($event)" v-model="checkedCommand" :disabled="disabled">
+					<select class="form-control" v-model="checkedCommandEntry" @change="selectCommand">
 						<option value="null">无</option>
 						<option v-for="(key, item) in metaJSON.command" :value="key">{{key}}</option>
 					</select>
 				</div>
 			</div>
 			<div class="flex-input">
-				<input class="form-control" type="text" :disabled="disabled" v-for="(index, item) in currentCommand.params" :placeholder="item.desc" :value="item.value" @input="updateCommandParams($event, index)">
+				<input class="form-control" type="text" v-for="(index, item) in currentCommandDetail.params" :placeholder="item.desc" v-model="item.value">
 			</div>
 			<div v-show="showAddOptionButton" class="form-group form-group-sm">
-				<m-common-options :all-options="currentCommand.options" :is-command="true" :disabled="disabled"></m-common-options>
+				<m-common-options :all-options="currentCommandDetail.options" :is-command="true"></m-common-options>
 			</div>
-			<div class="button-group">
-				<button type="button" class="btn btn-primary btn-sm" @click="modifyCommand()">修改</button>
-				<button type="button" class="btn btn-success btn-sm" @click="applyCommand()">确认</button>
-			</div>
+			<pre v-show="currentCommandDetail.desc"><code>{{currentCommandDetail.desc}}</code></pre>
 		</div>
-		<pre style="margin-top: 15px;" v-show="currentCommand.desc"><code>{{currentCommand.desc}}</code></pre>
+		<div class="button-group">
+			<button type="button" class="btn btn-success btn-sm" @click="applyAll()">确认所有参数</button>
+		</div>
 		<hr>
 	</div>
 </template>
+<script>
+import Vue from 'vue';
+
+import store from 'store';
+
+import { copyObj } from 'utils/common.js';
+
+import CommonOptopn from './common-options.vue';
+
+import Event from './event.vue';
+
+export default {
+	name: 'Command',
+	data() {
+		return {
+			showAddOptionButton: false,
+			checkedCommandEntry: 'null',
+			currentCommandDetail: {}
+		};
+	},
+	vuex: {
+		getters: {
+			metaJSON: () => store.state.metaJSON
+		}
+	},
+	components: {
+		'm-common-options': CommonOptopn
+	},
+	ready() {
+		Event.$on('i-will-recive-all', () => {
+			Event.$emit('send-command-entry', this.checkedCommandEntry);
+			Event.$emit('send-command-params', this.currentCommandDetail.params);
+		});
+		Event.$on('modify-command', (obj) => {
+			this.checkedCommandEntry = obj.commandEntry;
+			this.currentCommandDetail = copyObj(this.metaJSON.command[this.checkedCommandEntry]);
+			this.currentCommandDetail.params.forEach((item, index) => {
+				Vue.set(this.currentCommandDetail.params[index], 'value', obj.commandParams[index].value);
+			});
+			this.showAddOptionButton = !!this.currentCommandDetail.options;
+		})
+	},
+	methods: {
+		selectCommand() {
+			if (this.checkedCommandEntry !== 'null') {
+				this.currentCommandDetail = copyObj(this.metaJSON.command[this.checkedCommandEntry]);
+				this.currentCommandDetail.params.forEach((item, index) => {
+					Vue.set(this.currentCommandDetail.params[index], 'value', '');
+				});
+				this.showAddOptionButton = !!this.currentCommandDetail.options;
+			}
+		},
+		applyAll() {
+			Event.$emit('i-will-recive-all');
+			Event.$emit('should-generate');
+		}
+	}
+};
+</script>
 <style scoped>
 .checked-command span {
 	cursor: pointer;
@@ -43,80 +101,3 @@
 	margin-right: 0;
 }
 </style>
-<script>
-import Vue from 'vue';
-
-import store from 'store';
-import actions from 'actions';
-
-import { copyObj } from 'utils/common.js';
-
-import CommonOptopn from './common-options.vue';
-
-import Event from './event.vue';
-
-export default {
-	name: 'Command',
-	data() {
-		return {
-			showAddOptionButton: false,
-			currentCommand: {},
-			currentEntry: '',
-			disabled: false,
-			checkedCommand: ''
-		};
-	},
-	vuex: {
-		getters: {
-			metaJSON: () => store.state.metaJSON,
-			command: () => store.state.cmd.command
-		}
-	},
-	components: {
-		'm-common-options': CommonOptopn
-	},
-	methods: {
-		selectCommand(e) {
-			let value = e.target.value;
-			if (value === 'null') {
-				this.currentEntry = '';
-				this.currentCommand = {};
-			} else {
-				this.currentEntry = value;
-				this.currentCommand = copyObj(this.metaJSON.command[value]);
-			}
-		},
-		updateCommandParams(e, index) {
-			Vue.set(this.currentCommand.params[index], 'value', e.target.value);
-		},
-		modifyCommand() {
-			this.disabled = false;
-			actions.addCommand(store, {})
-		},
-		applyCommand() {
-			this.disabled = true;
-			actions.addCommand(store, {
-				key: this.currentEntry,
-				params: this.currentCommand.params,
-				options: {}
-			})
-			Event.$emit('applyAllOption', true);
-		}
-	},
-	watch: {
-		'command': {
-			handler() {
-				this.checkedCommand = this.command.key;
-				Vue.set(this.currentCommand, 'params', this.command.params);
-				Vue.set(this.currentCommand, 'options', this.command.options);
-			}
-		},
-		'currentCommand': {
-			handler() {
-				this.showAddOptionButton = !!(this.currentCommand.options);
-			},
-			deep: true
-		}
-	}
-};
-</script>

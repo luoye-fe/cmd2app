@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<button type="button" @click="addOption()" :disabled="disabled" class="btn btn-default btn-sm">新增参数</button>
+		<button type="button" @click="addOption()" class="btn btn-default btn-sm">新增参数</button>
 		<div v-for="(index, optionItem) in currentOption" class="row">
 			<div class="col-xs-3">
 				<select class="form-control" v-model="optionItem.checked" @change="updateDesc($event)" :disabled="optionItem.disabled || disabled">
@@ -12,23 +12,11 @@
 			</div>
 			<div class="col-xs-3">
 				<button type="button" class="btn btn-danger btn-sm" @click="delOption(index)">删除</button>
-				<button type="button" class="btn btn-primary btn-sm" @click="modifyOption(index)">修改</button>
-				<button type="button" class="btn btn-success btn-sm" @click="applyOption(index)">确认</button>
 			</div>
 		</div>
 	</div>
 </template>
-<style scoped>
-.icon-aliicon {
-	cursor: pointer;
-}
-.row {
-	padding: 10px 0 5px;box-sizing: border-box;
-}
-</style>
 <script>
-import Vue from 'vue';
-
 import store from 'store';
 import actions from 'actions';
 
@@ -41,18 +29,21 @@ export default {
 			currentOption: []
 		};
 	},
-	vuex: {
-		getters: {
-			globalOptions: () => store.state.cmd.globalOptions,
-			commandOptions: () => store.state.cmd.command.options
-		}
-	},
-	props: ['allOptions', 'isCommand', 'disabled'],
+	props: ['allOptions', 'isCommand'],
 	ready() {
-		Event.$on('applyAllOption', (isFromEvent) => {
-			this.currentOption.forEach((item, index) => {
-				this.applyOption(index, isFromEvent);
-			})
+		Event.$on('i-will-recive-all', () => {
+			if (this.isCommand) {
+				Event.$emit('send-command-options', this.currentOption);
+			} else {
+				Event.$emit('send-global-options', this.currentOption);
+			}
+		});
+		Event.$on('modify-command', (obj) => {
+			if (this.isCommand) {
+				this.currentOption = obj.commandOptions;
+			} else {
+				this.currentOption = obj.globalOptions;
+			}
 		})
 	},
 	methods: {
@@ -70,7 +61,6 @@ export default {
 				checked: Object.keys(this.allOptions)[0],
 				value: '',
 				desc: this.allOptions[Object.keys(this.allOptions)[0]].desc,
-				disabled: false
 			})
 		},
 		updateDesc(e) {
@@ -81,76 +71,16 @@ export default {
 			})
 		},
 		delOption(index) {
-			actions.delOption(store, this.currentOption[index].checked, this.isCommand);
 			this.currentOption.splice(index, 1);
-		},
-		modifyOption(index) {
-			this.currentOption[index].disabled = false;
-		},
-		applyOption(index, isFromEvent) {
-			let tempcheck = {};
-			for (let i = 0; i < this.currentOption.length; i++) {
-				let item = this.currentOption[i];
-				if (item.disabled) {
-					tempcheck[item.checked] = true;
-				}
-			}
-			if (tempcheck[this.currentOption[index].checked] && !isFromEvent) {
-				actions.alert(store, {
-					show: true,
-					title: '提示',
-					msg: '参数已存在',
-					type: 'danger'
-				})
-				return;
-			}
-			this.currentOption[index].disabled = true;
-			let cur = {};
-			this.currentOption.forEach((item) => {
-				if (item.disabled) {
-					cur[item.checked] = {
-						value: item.value
-					}
-				}
-			})
-			actions.addNewOption(store, cur, this.isCommand);
-		}
-	},
-	watch: {
-		globalOptions: {
-			handler() {
-				if (!this.isCommand) {
-					this.currentOption = [];
-					Object.keys(this.globalOptions).forEach((item) => {
-						this.currentOption.push({
-							checked: item,
-							value: this.globalOptions[item].value,
-							desc: this.allOptions[item].desc,
-							disabled: false
-						});
-					});
-				}
-			},
-			deep: true
-		},
-		commandOptions: {
-			handler() {
-				setTimeout(() => {
-					if (this.isCommand) {
-						this.currentOption = [];
-						Object.keys(this.commandOptions).forEach((item) => {
-							this.currentOption.push({
-								checked: item,
-								value: this.commandOptions[item].value,
-								desc: this.allOptions[item].desc,
-								disabled: false
-							});
-						});
-					}
-				}, 1);
-			},
-			deep: true
 		}
 	}
 };
 </script>
+<style scoped>
+.icon-aliicon {
+	cursor: pointer;
+}
+.row {
+	padding: 10px 0 5px;box-sizing: border-box;
+}
+</style>

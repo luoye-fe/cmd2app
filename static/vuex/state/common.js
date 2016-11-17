@@ -9,5 +9,10 @@ export default {
 		title: 'tips',
 		msg: 'This is tips main body.'
 	},
+	sudoPwd: '',
+	requireSudoPwd: {
+		show: false,
+		apply: function() {}
+	},
 	showClient: false
 };

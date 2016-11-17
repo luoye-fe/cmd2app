@@ -5,6 +5,7 @@
 	<m-client></m-client>
 	<m-init></m-init>
 	<m-welcome></m-welcome>
+	<m-require-sudo-pwd></m-require-sudo-pwd>
 </template>
 <style lang="less">
 @import url('../css/app.less');
@@ -20,6 +21,8 @@ import Init from './init.vue';
 
 import Welcome from './welcome.vue';
 
+import RequireSudoPwd from './require-sudo-pwd.vue';
+
 export default {
 	name: 'Index',
 	components: {
@@ -28,7 +31,8 @@ export default {
 		'm-main': Main,
 		'm-client': Client,
 		'm-init': Init,
-		'm-welcome': Welcome
+		'm-welcome': Welcome,
+		'm-require-sudo-pwd': RequireSudoPwd
 	}
 };
 </script>

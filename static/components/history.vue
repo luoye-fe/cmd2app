@@ -13,7 +13,7 @@
 				<tr v-for="(index, item) in commandHistory" track-by="$index">
 					<th scope="row">{{index + 1}}</th>
 					<td class="table-code">
-						<span>{{item.sudo + item.entry + item.globalOptions + item.command}}</span>
+						<span>{{item.cmdStr}}</span>
 					</td>
 					<td class="opt-button">
 						<div>
@@ -28,6 +28,37 @@
 		<p class="no-history" v-else>无历史记录</p>
 	</div>
 </template>
+<script>
+import store from 'store';
+import actions from 'actions';
+
+import { ipcRenderer } from 'electron';
+
+import Event from './event.vue';
+
+import { generateCmdRsult } from 'utils/common.js';
+
+export default {
+	name: 'History',
+	vuex: {
+		getters: {
+			commandHistory: () => store.state.commandHistory
+		}
+	},
+	methods: {
+		delCommand(index) {
+			actions.delHistory(store, index);
+		},
+		modifyCommand(item) {
+			Event.$emit('modify-command', item);
+		},
+		runCommand(item) {
+			ipcRenderer.send('command-will-run', item.cmdStr);
+		}
+	}
+};
+</script>
+
 <style scoped>
 .thead-default {
 
@@ -68,31 +99,3 @@
     color: #333333;
 }
 </style>
-<script>
-import store from 'store';
-import actions from 'actions';
-
-import { ipcRenderer } from 'electron';
-
-import Event from './event.vue';
-
-export default {
-	name: 'History',
-	vuex: {
-		getters: {
-			commandHistory: () => store.state.commandHistory
-		}
-	},
-	methods: {
-		delCommand(index) {
-			actions.delHistory(store, index);
-		},
-		modifyCommand(item) {
-			actions.updateWholeCMD(store, item.cmd);
-		},
-		runCommand(item) {
-			ipcRenderer.send('command-will-run',  item.sudo + item.entry + item.globalOptions + item.command);
-		}
-	}
-};
-</script>

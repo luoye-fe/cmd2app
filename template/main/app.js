@@ -8,6 +8,8 @@ import { app, BrowserWindow, Tray, Menu, ipcMain } from 'electron';
 import './ipc/index.js';
 
 import env from './env.js';
+import menuTemplate from './menu.js';
+import pkg from '../resource/package.json';
 
 let mainWindow = null;
 let appIcon = null;
@@ -39,6 +41,8 @@ function createWindow() {
 
 		// 引入开发者工具 (引入后注释掉)
 		// BrowserWindow.addDevToolsExtension('your dev tool path');
+	} else {
+		Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate(app)));
 	}
 
 	mainWindow.on('close', (e) => {

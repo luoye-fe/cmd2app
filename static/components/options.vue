@@ -1,7 +1,7 @@
 <template>
 	<div class="form-group form-group-sm" v-show="metaJSON.globalOptions">
 		<label>Global Options</label>
-		<m-common-options :all-options="metaJSON.globalOptions" :is-command="false" :disabled="false"></m-common-options>
+		<m-common-options :all-options="metaJSON.globalOptions" :is-command="false"></m-common-options>
 		<hr>
 	</div>
 </template>

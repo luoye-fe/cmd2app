@@ -1,8 +1,8 @@
 import { ipcMain, BrowserWindow } from 'electron';
 
-import { execCmd } from '../utils/common.js';
+import { execCmd, kill } from '../utils/common.js';
 
-import { spawn } from 'child_process';
+import { exec } from 'child_process';
 
 let sudoPwd = '';
 let resultCommand = '';
@@ -16,7 +16,23 @@ ipcMain.on('command-will-run', (ev, command, pwd) => {
 		command = `echo ${sudoPwd} | ${command.replace('sudo', 'sudo -S')}`;
 	}
 	resultCommand = command;
-	let child = execCmd(command);
+
+	let child = null;
+
+	child = exec(command, {
+		env: {
+			PATH: process.env.PATH
+		}
+	}, (err, stdout, stderr) => {
+		if (err.signal === 'SIGKILL') {
+			return;
+		}
+		if ((!!(err || stderr) || !sudoPwd) && /^sudo/.test(preCommand)) {
+			ev.sender.send('command-require-sudo', preCommand);
+			sudoPwd = '';
+		}
+	});
+
 	let pid = child.pid;
 	ev.sender.send('command-begin', pid);
 	child.stdout.on('data', (data) => {
@@ -26,11 +42,6 @@ ipcMain.on('command-will-run', (ev, command, pwd) => {
 		});
 	});
 	child.stderr.on('data', (data) => {
-		if (data && !sudoPwd && /^sudo/.test(preCommand)) {
-			ev.sender.send('command-require-sudo', preCommand);
-			sudoPwd = '';
-			return;
-		}
 		ev.sender.send('command-runing', {
 			data: data,
 			pid: pid
@@ -45,16 +56,5 @@ ipcMain.on('command-will-run', (ev, command, pwd) => {
 });
 
 ipcMain.on('command-force-close', (ev, pid) => {
-	if ((sudoPwd && process.platform === 'darwin') || /^echo/.test(resultCommand)) {
-		// sudo 启动的进程会有多个 pid 存在
-		execCmd(`echo ${sudoPwd} | sudo -S kill -9 ${pid}`, () => {
-			execCmd(`echo ${sudoPwd} | sudo -S kill -9 ${parseInt(pid) + 2}`, () => {
-				execCmd(`echo ${sudoPwd} | sudo -S kill -9 ${parseInt(pid) + 2 + 1}`);
-			});
-		});
-	} else {
-		try {
-			process.kill(pid);
-		} catch (e) {}
-	}
+	kill(pid);
 });

@@ -2,6 +2,8 @@
   "dependencies": {
     "babel-runtime": "^6.11.6",
     "fix-path": "^2.0.0",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "ps-tree": "^1.1.0",
+    "sudo-prompt": "^6.2.0"
   }
 }

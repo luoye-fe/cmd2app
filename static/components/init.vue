@@ -11,7 +11,6 @@
 				<p>{{tips}}</p>
 			</div>
 		</div>
-		<m-require-sudo-pwd :show-modal.sync="showModal" :apply="apply"></m-require-sudo-pwd>
 	</div>
 </template>
 <script>
@@ -30,27 +29,23 @@ export default {
 		return {
 			showInit: true,
 			tips: '正在初始化 ...',
-			showModal: false,
-			metaJSON: window.metaJSON,
-			apply(pwd) {
-				if (process.platform === 'win32') {
-					return;
-				}
-				ipcRenderer.send('app-init-input-pwd', pwd);
-				let obj = copyObj(this.metaJson)
-				setTimeout(() => {
-					ipcRenderer.send('app-init-will-check', obj);
-				}, 0);
-			}
+			metaJSON: window.metaJSON
 		};
 	},
-	components: {
-		'm-require-sudo-pwd': RequireSudoPwd
+	vuex: {
+		getters: {
+			sudoPwd: () => store.state.sudoPwd
+		}
 	},
 	ready() {
 		ipcRenderer.on('app-init-has-check', (ev, result) => {
 			if (result.error && result.type === 'nopwd') {
-				this.showModal = true;
+				actions.setRequireSudoPwd(store, {
+					show: true,
+					apply: () => {
+						this.apply(this.sudoPwd)
+					}
+				});
 			} else if (result.error && result.type === 'nonpm') {
 				actions.alert(store, {
 					show: true,
@@ -65,6 +60,18 @@ export default {
 			}
 		})
 		ipcRenderer.send('app-init-will-check', copyObj(window.metaJSON));
+	},
+	methods: {
+		apply(pwd) {
+			if (process.platform === 'win32') {
+				return;
+			}
+			ipcRenderer.send('app-init-input-pwd', pwd);
+			let obj = copyObj(this.metaJson)
+			setTimeout(() => {
+				ipcRenderer.send('app-init-will-check', obj);
+			}, 0);
+		}
 	}
 };
 </script>

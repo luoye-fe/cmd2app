@@ -11,3 +11,11 @@ export const HIDEALERT = (state) => {
 export const TOGGLECLIENT = (state, show) => {
 	state.showClient = show;
 };
+
+export const SETREQUIRESUDOPWD = (state, obj) => {
+	state.requireSudoPwd = obj;
+};
+
+export const SETSUDOPWD = (state, pwd) => {
+	state.sudoPwd = pwd;
+};

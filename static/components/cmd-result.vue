@@ -1,14 +1,13 @@
 <template>
 	<div class="form-group form-group-sm">
 		<label>Result</label>
-		<pre><code>{{sudo}}{{entry}}{{globalOptions}}{{command}}</code></pre>
+		<pre><code>{{cmdStr}}</code></pre>
 		<hr>
 		<button type="button" class="btn btn-success btn-sm" @click="runCommand()">运行</button>
 		<div style="margin-top: 15px;">
 			<a class="btn btn-info btn-sm" href="javascript:void(0)" @click="openUrl(metaJSON.repository)">README.md</a>
 		</div>
 		<hr>
-		<m-require-sudo-pwd :show-modal.sync="showModal" :apply="apply"></m-require-sudo-pwd>
 	</div>
 </template>
 <script>
@@ -17,9 +16,9 @@ import actions from 'actions';
 
 import { ipcRenderer } from 'electron';
 
-import { openUrl } from 'utils/common.js';
+import { openUrl, generateCmdRsult } from 'utils/common.js';
 
-import RequireSudoPwd from './require-sudo-pwd.vue';
+import Event from './event.vue';
 
 export default {
 	name: 'CmdResult',
@@ -27,76 +26,83 @@ export default {
 		return {
 			sudo: '',
 			entry: '',
-			command: '',
-			globalOptions: '',
-			showModal: false,
-			currentCommand: ''
+			globalOptions: [],
+			commandEntry: '',
+			commandParams: [],
+			commandOptions: [],
+			cmdStr: '',
+			requireSudoCmdStr: ''
 		};
 	},
 	vuex: {
 		getters: {
-			cmd: () => store.state.cmd,
-			metaJSON: () => store.state.metaJSON
+			metaJSON: () => store.state.metaJSON,
+			commandHistory: () => store.state.commandHistory,
+			sudoPwd: () => store.state.sudoPwd
 		}
-	},
-	components: {
-		'm-require-sudo-pwd': RequireSudoPwd
 	},
 	ready() {
 		ipcRenderer.on('command-require-sudo', (ev, command) => {
-			this.currentCommand = command;
-			this.showModal = true;
+			this.requireSudoCmdStr = command;
+			actions.setRequireSudoPwd(store, {
+				show: true,
+				apply: () => {
+					this.apply(this.sudoPwd);
+				}
+			});
 		});
+		Event.$on('send-entry', (obj) => {
+			this.sudo = obj.sudo || false;
+			this.entry = obj.entry || '';
+		})
+		Event.$on('send-global-options', (obj) => {
+			this.globalOptions = obj || [];
+		})
+		Event.$on('send-command-entry', (obj) => {
+			this.commandEntry = obj || '';
+		})
+		Event.$on('send-command-params', (obj) => {
+			this.commandParams = obj || [];
+		})
+		Event.$on('send-command-options', (obj) => {
+			this.commandOptions = obj || [];
+		})
+		Event.$on('should-generate', () => {
+			this.generateRsult();
+		})
 	},
 	methods: {
 		generateRsult() {
-			this.sudo = '';
-			this.entry = ''
-			this.globalOptions = '';
-			this.command = ' ';
-			this.sudo = this.cmd.sudo ? 'sudo ' : '';
-			this.entry = this.cmd.entry;
-			Object.keys(this.cmd.globalOptions).forEach((item) => {
-				let curOption = this.cmd.globalOptions[item];
-				curOption.value === '' ? this.globalOptions += ` --${item}` : this.globalOptions += ` --${item}=${curOption.value}`;
-			});
-			if (this.cmd.command.key) {
-				this.command += this.cmd.command.key;
-				if (this.cmd.command.params) {
-					this.cmd.command.params.forEach((item) => {
-						this.command += item.value ? (' ' + item.value) : '';
-					})
-				}
-				if (this.cmd.command.options) {
-					Object.keys(this.cmd.command.options).forEach((item) => {
-						let curOption = this.cmd.command.options[item];
-						curOption.value === '' ? this.command += ` --${item}` : this.command += ` --${item}=${curOption.value}`;
-					});
-				}
-			}
+			this.cmdStr = generateCmdRsult(this.sudo, this.entry, this.globalOptions, this.commandEntry, this.commandParams, this.commandOptions);
 		},
 		runCommand() {
-			ipcRenderer.send('command-will-run', this.sudo + this.entry + this.globalOptions + this.command);
-			// actions.addHistory(store, this.sudo + this.entry + this.globalOptions + this.command);
-			actions.addHistory(store, {
-				entry: this.entry,
-				globalOptions: this.globalOptions,
-				command: this.command,
-				sudo: this.sudo,
-				cmd: this.cmd
-			});
+			this.commandHistory.forEach((item) => {
+				if (item.cmdStr === this.cmdStr) {
+					actions.alert(store, {
+						show: true,
+						title: '提示',
+						msg: '历史记录已存在，就不重复添加了哦',
+						type: 'info'
+					})
+					return;
+				} else {
+					actions.addHistory(store, {
+						sudo: this.sudo,
+						entry: this.entry,
+						globalOptions: this.globalOptions,
+						commandEntry: this.commandEntry,
+						commandParams: this.commandParams,
+						commandOptions: this.commandOptions,
+						cmdStr: this.cmdStr
+					});
+				}
+			})
+			ipcRenderer.send('command-will-run', this.cmdStr, this.sudoPwd);
+			this.requireSudoCmdStr = this.cmdStr;
 		},
 		openUrl: openUrl,
 		apply(pwd) {
-			ipcRenderer.send('command-will-run', this.currentCommand, pwd);
-		}
-	},
-	watch: {
-		'cmd': {
-			handler() {
-				this.generateRsult();
-			},
-			deep: true
+			ipcRenderer.send('command-will-run', this.requireSudoCmdStr, pwd);
 		}
 	}
 };
