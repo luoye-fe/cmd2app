@@ -80,6 +80,15 @@ export default {
 			this.cmdStr = generateCmdRsult(this.sudo, this.entry, this.globalOptions, this.commandEntry, this.commandParams, this.commandOptions);
 		},
 		runCommand() {
+			if (this.cmdStr === '') {
+				actions.alert(store, {
+					show: true,
+					title: '提示',
+					msg: '先点击「确认所有参数」再运行',
+					type: 'info'
+				})
+				return;
+			};
 			this.commandHistory.forEach((item) => {
 				if (item.cmdStr === this.cmdStr) {
 					actions.alert(store, {
