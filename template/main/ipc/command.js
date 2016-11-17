@@ -26,7 +26,7 @@ ipcMain.on('command-will-run', (ev, command, pwd) => {
 		});
 	});
 	child.stderr.on('data', (data) => {
-		if (data && !sudoPwd) {
+		if (data && !sudoPwd && /^sudo/.test(preCommand)) {
 			ev.sender.send('command-require-sudo', preCommand);
 			sudoPwd = '';
 			return;
@@ -46,6 +46,7 @@ ipcMain.on('command-will-run', (ev, command, pwd) => {
 
 ipcMain.on('command-force-close', (ev, pid) => {
 	if ((sudoPwd && process.platform === 'darwin') || /^echo/.test(resultCommand)) {
+		// sudo 启动的进程会有多个 pid 存在
 		execCmd(`echo ${sudoPwd} | sudo -S kill -9 ${pid}`, () => {
 			execCmd(`echo ${sudoPwd} | sudo -S kill -9 ${parseInt(pid) + 2}`, () => {
 				execCmd(`echo ${sudoPwd} | sudo -S kill -9 ${parseInt(pid) + 2 + 1}`);
