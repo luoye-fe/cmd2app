@@ -23,6 +23,8 @@ import RequireSudoPwd from './require-sudo-pwd.vue';
 import actions from 'actions';
 import store from 'store';
 
+import Event from './event.vue';
+
 export default {
 	name: 'Init',
 	data() {
@@ -39,14 +41,7 @@ export default {
 	},
 	ready() {
 		ipcRenderer.on('app-init-has-check', (ev, result) => {
-			if (result.error && result.type === 'nopwd') {
-				actions.setRequireSudoPwd(store, {
-					show: true,
-					apply: () => {
-						this.apply(this.sudoPwd)
-					}
-				});
-			} else if (result.error && result.type === 'nonpm') {
+			if (result.error && result.type === 'nonpm') {
 				actions.alert(store, {
 					show: true,
 					type: 'warning',
@@ -59,19 +54,9 @@ export default {
 				this.showInit = false;
 			}
 		})
-		ipcRenderer.send('app-init-will-check', copyObj(this.metaJSON));
-	},
-	methods: {
-		apply(pwd) {
-			if (process.platform === 'win32') {
-				return;
-			}
-			ipcRenderer.send('app-init-input-pwd', pwd);
-			let obj = copyObj(this.metaJSON)
-			setTimeout(() => {
-				ipcRenderer.send('app-init-will-check', obj);
-			}, 0);
-		}
+		Event.$on('can-init', () => {
+			ipcRenderer.send('app-init-will-check', copyObj(this.metaJSON));
+		})
 	}
 };
 </script>

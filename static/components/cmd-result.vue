@@ -46,15 +46,6 @@ export default {
 		}
 	},
 	ready() {
-		ipcRenderer.on('command-require-sudo', (ev, command) => {
-			this.requireSudoCmdStr = command;
-			actions.setRequireSudoPwd(store, {
-				show: true,
-				apply: () => {
-					this.apply(this.sudoPwd);
-				}
-			});
-		});
 		Event.$on('send-entry', (obj) => {
 			this.sudo = obj.sudo || false;
 			this.entry = obj.entry || '';
@@ -110,13 +101,10 @@ export default {
 					});
 				}
 			})
-			ipcRenderer.send('command-will-run', this.cmdStr, this.sudoPwd);
+			ipcRenderer.send('command-will-run', this.cmdStr);
 			this.requireSudoCmdStr = this.cmdStr;
 		},
 		openUrl: openUrl,
-		apply(pwd) {
-			ipcRenderer.send('command-will-run', this.requireSudoCmdStr, pwd);
-		},
 		applyAll() {
 			Event.$emit('i-will-recive-all');
 			Event.$emit('should-generate');

@@ -1,11 +1,8 @@
-import { ipcMain, BrowserWindow } from 'electron';
+import { ipcMain } from 'electron';
 
 import { execCmd, kill } from '../utils/common.js';
 
 import { exec } from 'child_process';
-
-let sudoPwd = '';
-let resultCommand = '';
 
 ipcMain.on('command-will-run', (ev, command, pwd) => {
 	let preCommand = command;
@@ -13,23 +10,15 @@ ipcMain.on('command-will-run', (ev, command, pwd) => {
 		sudoPwd = pwd;
 	}
 	if (/^sudo/.test(command)) {
-		command = `echo ${sudoPwd} | ${command.replace('sudo', 'sudo -S')}`;
+		command = `echo ${global.pwd} | ${command.replace('sudo', 'sudo -S')}`;
 	}
-	resultCommand = command;
-
-	let child = null;
-
-	child = exec(command, {
+	let child = exec(command, {
 		env: {
 			PATH: process.env.PATH
 		}
 	}, (err, stdout, stderr) => {
 		if (err.signal === 'SIGKILL') {
 			return;
-		}
-		if ((!!(err || stderr) || !sudoPwd) && /^sudo/.test(preCommand)) {
-			ev.sender.send('command-require-sudo', preCommand);
-			sudoPwd = '';
 		}
 	});
 

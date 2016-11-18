@@ -8,7 +8,6 @@ import { normalizePath, execCmd } from '../utils/common.js';
 
 const platform = process.platform;
 const resourcePath = path.join(__dirname, '../../resource');
-let sudoPwd = '';
 
 let dialogInfoObj = {
 	type: 'info',
@@ -17,35 +16,18 @@ let dialogInfoObj = {
 	message: '提示信息'
 };
 
-function apply(success, fail) {
+function apply() {
 	let cmd = '';
 	let curr = normalizePath(resourcePath);
 	if (platform !== 'win32') {
-		cmd = `cd ${curr} && echo ${sudoPwd} | sudo -S npm link`;
+		cmd = `cd ${curr} && echo ${global.pwd} | sudo -S npm link`;
 	} else {
 		cmd = `cd ${curr} && npm link`;
 	}
 	execCmd(cmd, (err, stdout, stderr) => {
-		if (err && !sudoPwd) {
-			fail();
-			return;
+		if (err) {
+			console.log(err);
 		}
-		success();
-	});
-}
-
-function tryToApply(ev) {
-	apply(() => {
-		// success
-		ev.sender.send('app-init-has-check', {
-			error: 0
-		});
-	}, () => {
-		// fail require sudo pwd
-		ev.sender.send('app-init-has-check', {
-			error: 1,
-			type: 'nopwd'
-		});
 	});
 }
 
@@ -85,7 +67,7 @@ ipcMain.on('app-init-will-check', (ev, metaJSON) => {
 
 		checkCommand(metaJSON)
 			.then(() => {
-				tryToApply(ev);
+				apply();
 			})
 			.catch(() => {
 				ev.sender.send('app-init-has-check', {
@@ -95,6 +77,6 @@ ipcMain.on('app-init-will-check', (ev, metaJSON) => {
 	});
 });
 
-ipcMain.on('app-init-input-pwd', (ev, pwd) => {
-	sudoPwd = pwd;
-});
+// ipcMain.on('app-init-input-pwd', (ev, pwd) => {
+// 	sudoPwd = pwd;
+// });

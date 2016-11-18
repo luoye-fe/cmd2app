@@ -1,5 +1,5 @@
 <template>
-	<div class="modal" transition="fade" v-show="requireSudoPwd.show">
+	<div class="modal" transition="fade" v-show="show && !win32">
 		<div class="modal-dialog modal-sm">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -7,17 +7,15 @@
 					<h4 class="modal-title">提示</h4>
 				</div>
 				<div class="modal-body">
-					<div v-if="win32">
-						<p>请用管理员身份打开应用</p>
-					</div>
 					<div v-else>
 						<p>请输入管理员密码</p>
-						<input type="text" class="form-control" v-model="pwd">
+						<input type="password" class="form-control" v-model="pwd" @keypress.enter="applySudoPwd">
+						<span v-show="error" style="font-size: 12px;line-height: 28px;color: #ff5151;">密码错误</span>
 					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal" @click="hide">取消</button>
-					<button type="button" class="btn btn-primary" @click="applySudoPwd()">确认</button>
+					<button type="button" class="btn btn-primary" @click="applySudoPwd">确认</button>
 				</div>
 			</div>
 		</div>
@@ -30,29 +28,40 @@ import actions from 'actions';
 import { ipcRenderer } from 'electron';
 import { copyObj } from '../utils/common.js';
 
+import Event from './event.vue';
+
 export default {
 	name: 'RequireSudoPwd',
 	data() {
 		return {
 			win32: process.platform === 'win32',
-			pwd: ''
+			pwd: '',
+			show: true,
+			error: false
 		};
 	},
-	vuex: {
-		getters: {
-			requireSudoPwd: () => store.state.requireSudoPwd
+	ready() {
+		if (this.win32) {
+			Event.$emit('can-init');
+			return;
 		}
+		ipcRenderer.on('pwd-checked', (ev, result) => {
+			if (result.error) {
+				this.error = true;
+			} else {
+				Event.$emit('can-init');
+				actions.setSudoPwd(store, this.pwd);
+				this.hide();
+			}
+		})
 	},
 	methods: {
 		applySudoPwd() {
-			actions.setSudoPwd(store, this.pwd);
-			this.requireSudoPwd.apply();
+			ipcRenderer.send('pwd-check', this.pwd);
 			this.hide();
 		},
 		hide() {
-			actions.setRequireSudoPwd(store, {
-				show: false
-			});
+			this.show = false;
 		}
 	}
 };
@@ -60,6 +69,7 @@ export default {
 <style>
 .modal {
 	display: block;
+	background: #fff;
 }
 .modal-sm {
 	width: 400px;margin: 50px auto 0;

@@ -31,30 +31,18 @@ export const execCmd = (command, cb) => {
 
 export const kill = (pid, signal = 'SIGKILL', callback = function() {}) => {
 	if (process.platform !== 'win32') {
+		let resultKilCmd = [];
 		psTree(pid, (err, children) => {
 			[pid].concat(
 				children.map(function(p) {
 					return p.PID;
 				})
 			).forEach(function(tpid) {
-				// try {
-				// 	// process.kill(tpid, signal);
-				// 	sudo.exec(`kill -9 ${tpid}`, {
-				// 		name: 'test'
-				// 	}, (err) => {
-
-				// 	});
-				// } catch (ex) {
-				// 	console.log(ex);
-				// }
-				sudo.exec(`kill -9 ${tpid}`, {
-					name: 'kill process'
-				}, (err, stdout, stderr) => {
-					if (err) {
-						console.log(err);
-					}
-				});
+				resultKilCmd.push(` sudo -S kill -9 ${tpid}`);
 			});
+			try {
+				execCmd(`echo ${global.pwd} |${resultKilCmd.join(' &&')}`);
+			} catch (e) {}
 			callback();
 		});
 	} else {
