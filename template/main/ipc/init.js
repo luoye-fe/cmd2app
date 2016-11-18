@@ -16,7 +16,7 @@ let dialogInfoObj = {
 	message: '提示信息'
 };
 
-function apply() {
+function apply(ev) {
 	let cmd = '';
 	let curr = normalizePath(resourcePath);
 	if (platform !== 'win32') {
@@ -28,6 +28,9 @@ function apply() {
 		if (err) {
 			console.log(err);
 		}
+		ev.sender.send('app-init-has-check', {
+			error: 0
+		});
 	});
 }
 
@@ -67,16 +70,12 @@ ipcMain.on('app-init-will-check', (ev, metaJSON) => {
 
 		checkCommand(metaJSON)
 			.then(() => {
-				apply();
+				apply(ev);
 			})
-			.catch(() => {
+			.catch((e) => {
 				ev.sender.send('app-init-has-check', {
 					error: 0
 				});
 			});
 	});
 });
-
-// ipcMain.on('app-init-input-pwd', (ev, pwd) => {
-// 	sudoPwd = pwd;
-// });
