@@ -20,7 +20,7 @@ import actions from 'actions';
 
 import { ipcRenderer } from 'electron';
 
-import { openUrl, generateCmdRsult } from 'utils/common.js';
+import { openUrl, generateCmdRsult, copyObj } from 'utils/common.js';
 
 import Event from './event.vue';
 
@@ -34,8 +34,7 @@ export default {
 			commandEntry: '',
 			commandParams: [],
 			commandOptions: [],
-			cmdStr: '',
-			requireSudoCmdStr: ''
+			cmdStr: ''
 		};
 	},
 	vuex: {
@@ -80,29 +79,31 @@ export default {
 				})
 				return;
 			};
-			this.commandHistory.forEach((item) => {
-				if (item.cmdStr === this.cmdStr) {
+			ipcRenderer.send('command-will-run', this.cmdStr);
+			let flag = false;
+			for (let i = 0; i < this.commandHistory.length; i++) {
+				if (this.commandHistory[i].cmdStr === this.cmdStr) {
 					actions.alert(store, {
 						show: true,
 						title: '提示',
 						msg: '历史记录已存在，就不重复添加了哦',
 						type: 'info'
 					})
+					flag = true;
 					return;
-				} else {
-					actions.addHistory(store, {
-						sudo: this.sudo,
-						entry: this.entry,
-						globalOptions: this.globalOptions,
-						commandEntry: this.commandEntry,
-						commandParams: this.commandParams,
-						commandOptions: this.commandOptions,
-						cmdStr: this.cmdStr
-					});
 				}
-			})
-			ipcRenderer.send('command-will-run', this.cmdStr);
-			this.requireSudoCmdStr = this.cmdStr;
+			}
+			if (!flag) {
+				actions.addHistory(store, copyObj({
+					sudo: this.sudo,
+					entry: this.entry,
+					globalOptions: this.globalOptions,
+					commandEntry: this.commandEntry,
+					commandParams: this.commandParams,
+					commandOptions: this.commandOptions,
+					cmdStr: this.cmdStr
+				}));
+			}
 		},
 		openUrl: openUrl,
 		applyAll() {

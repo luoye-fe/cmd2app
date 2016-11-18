@@ -43,7 +43,7 @@ export default {
 		});
 		Event.$on('modify-command', (obj) => {
 			this.sudo = obj.sudo;
-			this.entry = obj.entry;
+			this.checkedEntry = obj.entry;
 		})
 	}
 };

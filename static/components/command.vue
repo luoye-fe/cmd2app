@@ -38,7 +38,10 @@ export default {
 		return {
 			showAddOptionButton: false,
 			checkedCommandEntry: 'null',
-			currentCommandDetail: {}
+			currentCommandDetail: {
+				params: [],
+				options: {}
+			}
 		};
 	},
 	vuex: {
@@ -56,7 +59,7 @@ export default {
 		});
 		Event.$on('modify-command', (obj) => {
 			this.checkedCommandEntry = obj.commandEntry;
-			this.currentCommandDetail = copyObj(this.metaJSON.command[this.checkedCommandEntry]);
+			this.currentCommandDetail = this.checkedCommandEntry === 'null' ? {params: [], options: {}} : copyObj(this.metaJSON.command[this.checkedCommandEntry]);
 			this.currentCommandDetail.params.forEach((item, index) => {
 				Vue.set(this.currentCommandDetail.params[index], 'value', obj.commandParams[index].value);
 			});
@@ -71,6 +74,11 @@ export default {
 					Vue.set(this.currentCommandDetail.params[index], 'value', '');
 				});
 				this.showAddOptionButton = !!this.currentCommandDetail.options;
+			} else {
+				this.currentCommandDetail = {
+					params: [],
+					options: {}
+				}
 			}
 		}
 	}

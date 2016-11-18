@@ -36,7 +36,7 @@ import { ipcRenderer } from 'electron';
 
 import Event from './event.vue';
 
-import { generateCmdRsult } from 'utils/common.js';
+import { generateCmdRsult, copyObj } from 'utils/common.js';
 
 export default {
 	name: 'History',
@@ -50,7 +50,7 @@ export default {
 			actions.delHistory(store, index);
 		},
 		modifyCommand(item) {
-			Event.$emit('modify-command', item);
+			Event.$emit('modify-command', copyObj(item));
 		},
 		runCommand(item) {
 			ipcRenderer.send('command-will-run', item.cmdStr);
