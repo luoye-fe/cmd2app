@@ -76,7 +76,7 @@ export default {
 	border: 1px solid #eee;
 }
 .opt-button {
-	min-width: 120px;
+	min-width: 170px;
 	text-align: center;
 	position: relative;
 }
